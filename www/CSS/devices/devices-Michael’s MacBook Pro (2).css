@@ -1,0 +1,133 @@
+/*! Devices.css v0.1.16 | MIT License | github.com/picturepan2/devices.css */
+.device, .device::before, .device::after,
+.device *,
+.device *::before,
+.device *::after {
+  box-sizing: border-box;
+  display: block;
+}
+
+.device {
+  position: relative;
+  transform: scale(1);
+  z-index: 1;
+}
+
+.device .device-frame {
+  z-index: 1;
+}
+
+.device .device-content {
+  background-color: #fff;
+  background-position: center center;
+  background-size: cover;
+  object-fit: cover;
+  position: relative;
+}
+
+.device-macbook-pro {
+  height: calc(calc(60vw / 1.2052) * 0.7231);
+  width: 60vw;
+}
+
+.device-macbook-pro .device-frame {
+  background: #0d0d0d;
+  border-radius: calc(calc(60vw / 1.2052) * 0.0325);
+  box-shadow: inset 0 0 0 calc(calc(60vw / 1.2052) * 0.00325) #c8cacb;
+  height: calc(calc(60vw / 1.2052) * 0.62);
+  margin: 0 auto;
+  padding: calc(calc(60vw / 1.2052) * 0.0472) calc(calc(60vw / 1.2052) * 0.0309) calc(calc(60vw / 1.2052) * 0.06351) calc(calc(60vw / 1.2052) * 0.0309);
+  position: relative;
+  width: calc(60vw / 1.2052);
+}
+
+.device-macbook-pro .device-frame::after {
+  background: #272727;
+  border-radius: 0 0 calc(calc(60vw / 1.2052) * 0.0325) calc(calc(60vw / 1.2052) * 0.0325);
+  bottom: calc(calc(60vw / 1.2052) * 0.00325);
+  content: "";
+  height: calc(calc(60vw / 1.2052) * 0.04234);
+  left: calc(calc(60vw / 1.2052) * 0.00325);
+  position: absolute;
+  width: calc(calc(60vw / 1.2052) - (2 * calc(calc(60vw / 1.2052) * 0.00325)));
+}
+
+.device-macbook-pro .device-frame::before {
+  bottom: calc(calc(calc(60vw / 1.2052) * 0.02280) - calc(calc(calc(60vw / 1.2052) * 0.00325) * 2));
+  color: #c8cacb;
+  content: "MacBook Pro";
+  font-size: calc(calc(60vw / 1.2052) * 0.0195);
+  height: calc(calc(60vw / 1.2052) * 0.02605);
+  left: 50%;
+  line-height: calc(calc(60vw / 1.2052) * 0.02605);
+  margin-left: -100px;
+  position: absolute;
+  text-align: center;
+  width: 200px;
+  z-index: 1;
+}
+
+.device-macbook-pro .device-content {
+  border: calc(calc(60vw / 1.2052) * 0.00325) solid #121212;
+  border-radius: calc(calc(60vw / 1.2052) * 0.00325);
+  height: 100%;
+  width: 100%;
+}
+
+.device-macbook-pro .device-power {
+  background: #e2e3e4;
+  border: solid #d5d6d8;
+  border-radius: calc(calc(60vw / 1.2052) * 0.00325) calc(calc(60vw / 1.2052) * 0.00325) 0 0;
+  border-width: calc(calc(60vw / 1.2052) * 0.00325) calc(calc(calc(60vw / 1.2052) * 0.00325) * 2) 0 calc(calc(calc(60vw / 1.2052) * 0.00325) * 2);
+  height: calc(calc(60vw / 1.2052) * 0.02280);
+  margin-top: calc(calc(calc(calc(60vw / 1.2052) * 0.02280) - calc(calc(calc(60vw / 1.2052) * 0.00325) * 2)) * -1);
+  position: relative;
+  width: 60vw;
+  z-index: 9;
+}
+
+.device-macbook-pro .device-power::after, .device-macbook-pro .device-power::before {
+  content: "";
+  position: absolute;
+}
+
+.device-macbook-pro .device-power::after {
+  background: #d5d6d8;
+  border-radius: 0 0 calc(calc(calc(60vw / 1.2052) * 0.02280) - calc(calc(calc(60vw / 1.2052) * 0.00325) * 2)) calc(calc(calc(60vw / 1.2052) * 0.02280) - calc(calc(calc(60vw / 1.2052) * 0.00325) * 2));
+  box-shadow: inset 0 0 calc(calc(calc(60vw / 1.2052) * 0.00325) * 2) calc(calc(60vw / 1.2052) * 0.00325) #babdbf;
+  height: calc(calc(calc(calc(60vw / 1.2052) * 0.02280) - calc(calc(calc(60vw / 1.2052) * 0.00325) * 2)) - calc(calc(60vw / 1.2052) * 0.00325));
+  left: 50%;
+  margin-left: calc(calc(calc(60vw / 1.2052) * 0.1954) / -2);
+  top: calc(calc(calc(60vw / 1.2052) * 0.00325) * -1);
+  width: calc(calc(60vw / 1.2052) * 0.1954);
+}
+
+.device-macbook-pro .device-power::before {
+  background: #a0a3a7;
+  border-radius: 0 0 calc(calc(60vw / 1.2052) * 0.2931) calc(calc(60vw / 1.2052) * 0.2931)/0 0 calc(calc(60vw / 1.2052) * 0.0195) calc(calc(60vw / 1.2052) * 0.0195);
+  box-shadow: inset 0 -2px 6px 0 #474a4d;
+  height: calc(calc(60vw / 1.2052) * 0.0195);
+  left: calc(calc(calc(calc(60vw / 1.2052) * 0.00325) * 2) * -1);
+  margin: 0 auto;
+  top: calc(calc(calc(60vw / 1.2052) * 0.02280) - calc(calc(calc(60vw / 1.2052) * 0.00325) * 2));
+  width: 60vw;
+}
+
+.device-macbook-pro.device-spacegray .device-frame {
+  box-shadow: inset 0 0 0 calc(calc(60vw / 1.2052) * 0.00325) #767a7d;
+}
+
+.device-macbook-pro.device-spacegray .device-power {
+  background: #909496;
+  border-color: #767a7d;
+}
+
+.device-macbook-pro.device-spacegray .device-power::after {
+  background: #83878a;
+  box-shadow: inset 0 0 calc(calc(calc(60vw / 1.2052) * 0.00325) * 2) calc(calc(60vw / 1.2052) * 0.00325) #6a6d70;
+}
+
+.device-macbook-pro.device-spacegray .device-power::before {
+  background: #515456;
+  box-shadow: inset 0 -2px 6px 0 black;
+}

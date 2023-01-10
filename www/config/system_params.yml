@@ -1,0 +1,257 @@
+## DESCRIPTION:
+# This configuration sheet defines all parameters, which are specific per each System (i.e. instance). It defines how the client's 
+# system looks like. If we set-up a new system, we just want to change these parameters (but not the code itself). Hence, this config
+# sheet will be developed for each client, according to our form
+
+# ACCOUNT DEFAULT
+
+
+###------- GENERAL SETTINGS---------
+# These are
+
+user_settings: # will remame them as app settings will only have the selected values
+  show_name: FALSE
+  show_message: TRUE
+  navbar_height: 50
+  map_pane_start: TRUE
+  welcome_mode: "learning_modal"
+  language: ["ES", "PT", "EN"]
+  country: [Afghanistan, Albania, Algeria, Andorra, Angola, Antigua & Deps, Argentina, Armenia, Australia, Austria, Azerbaijan, Bahamas, Bahrain, Bangladesh, Barbados, Belarus, Belgium, Belize, Benin, Bhutan, Bolivia, Bosnia Herzegovina, Botswana, Brazil, Brunei, Bulgaria, Burkina, Burundi, Cambodia, Cameroon, Canada, Cape Verde, Central African Rep, Chad, Chile, China, Colombia, Comoros, Congo, Congo DR, Costa Rica, Croatia, Cuba, Cyprus, Czech Republic, Denmark, Djibouti, Dominica, Dominican Republic, East Timor, Ecuador, Egypt, El Salvador, Equatorial Guinea, Eritrea, Estonia, Ethiopia, Fiji, Finland, France, Gabon, Gambia, Georgia, Germany, Ghana, Greece, Grenada, Guatemala, Guinea, Guinea-Bissau, Guyana, Haiti, Honduras, Hungary, Iceland, India, Indonesia, Iran, Iraq, Ireland, Israel, Italy, Ivory Coast, Jamaica, Japan, Jordan, Kazakhstan, Kenya, Kiribati, Korea North, Korea South, Kosovo, Kuwait, Kyrgyzstan, Laos, Latvia, Lebanon, Lesotho, Liberia, Libya, Liechtenstein, Lithuania, Luxembourg, Macedonia, Madagascar, Malawi, Malaysia, Maldives, Mali, Malta, Marshall Islands, Mauritania, Mauritius, Mexico, Micronesia, Moldova, Monaco, Mongolia, Montenegro, Morocco, Mozambique, Myanmar, Namibia, Nauru, Nepal, Netherlands, New Zealand, Nicaragua, Niger, Nigeria, Norway, Oman, Pakistan, Palau, Panama, Papua New Guinea, Paraguay, Peru, Philippines, Poland, Portugal, Qatar, Romania, Rwanda, St Kitts & Nevis, St Lucia, Saint Vincent & the Grenadines, Samoa, San Marino, Sao Tome & Principe, Saudi Arabia, Senegal, Serbia, Seychelles, Sierra Leone, Singapore, Slovakia, Slovenia, Solomon Islands, Somalia, South Africa, South Sudan, Spain, Sri Lanka, Sudan, Suriname, Swaziland, Sweden, Switzerland, Syria, Taiwan, Tajikistan, Tanzania, Thailand, Togo, Tonga, Trinidad & Tobago, Tunisia, Turkey, Turkmenistan, Tuvalu, Uganda, Ukraine, United Arab Emirates, United Kingdom, United States, Uruguay, Uzbekistan, Vanuatu, Vatican City, Venezuela, Vietnam, Yemen, Zambia, Zimbabwe]
+  editable: ["PRENAME", "SURNAME", "Company", "LOCATION", "OPERATION_NAME"]
+
+  #user_profiles: ["admin", "admin"]
+  profiles:
+    "admin":
+      - "default"
+    "user":
+      ["CLIMATE_STANDARD"]
+
+# to be deleted
+#account_settings: # these are app choices
+#  business_type: ["Crop Consultant", "Input Company", "Equipment Company", "Start-up/Technology", "other"]
+ # business_size: ["Individual", "1-5 People", "5-20 People", "20-100 People", "> 100 People"]
+
+
+
+# Defines of the Full name is shown in the bar for the user menu and if messages are shown at all 
+#user_menu:
+ # show_name: FALSE
+ # show_message: TRUE
+
+data:
+  dec_sep: "," # how should be exported
+  csv_sep: ";" # how should be exported
+  encoding: "UTF-8"
+  NAvals: ""
+  initial_not_import: ["all_user", "all_element", "all_user_element", "all_user_element", "all_user_message", "all_user_event", "all_georef_user", "all_geo_share"]
+
+
+system:
+  logout: "https://demo.odapes.app/logout"
+  login: "https://demo.odapes.app"
+
+
+
+
+###------- DESIGN SETTINGS---------
+# This part defines the Style and DEsign related aspects of the System
+
+scaling:
+  max_rows: 600     # max number of pix per dimension of raster
+  min_pix: 1
+  max_cats: 100      #max cat numbers to aggregate
+  max_size: 8000000   #in this case I force to turn to raster
+  small_size: 50000  #in this case I don't need to rescale
+  smoother: 300      #factor for smootihing a polygon
+  n_bins: 10   # Number of bins for classification
+
+
+map_style:
+  palette:
+      "RasterBrick":
+        - "RdYlGn"
+      "RasterStack":
+        - "RdYlGn"
+      "RasterLayer":
+        - "RdYlGn"
+      "Point":
+        - "RdYlGn"
+      "PointChoropleths":
+        - "RdYlGn"
+      "Polygon":
+        - "RdYlGn"
+      "PolygonChoropleths":
+        - "RdYlGn"
+      "Structure":
+        ["red","blue", "green"]
+
+  opacity:
+      "RasterBrick":
+        - 0.8
+      "RasterStack":
+        - 0.8
+      "RasterLayer":
+        - 0.8
+      "Point":
+        - 0.8
+      "PointChoropleths":
+        - 0.6
+      "Polygon":
+        - 0.8
+      "PolygonChoropleths":
+        - 0.9
+      "Structure":
+        - 0.3
+  
+  strk:
+      "RasterBrick":
+        - FALSE
+      "RasterStack":
+        - FALSE
+      "RasterLayer":
+        - FALSE
+      "Point":
+        - TRUE
+      "PointChoropleths":
+        - TRUE
+      "Polygon":
+        - FALSE
+      "PolygonChoropleths":
+        - FALSE
+      "Structure":
+        - TRUE 
+
+  weight:
+      "RasterBrick":
+        - 2
+      "RasterStack":
+        - 2
+      "RasterLayer":
+        - 2
+      "Point":
+        - 1
+      "PointChoropleths":
+        - 2
+      "Polygon":
+        - 2
+      "PolygonChoropleths":
+        - 3
+      "Structure":
+        - 3
+
+  dash:
+      "RasterBrick":
+        - NULL
+      "RasterStack":
+        - NULL
+      "RasterLayer":
+        - NULL
+      "Point":
+        - NULL
+      "PointChoropleths":
+        - NULL
+      "Polygon":
+        - NULL
+      "PolygonChoropleths":
+        - "3"
+      "Structure":
+        - NULL
+  
+  point_pal: RdYlGn
+  point_opacity: 0.8
+  polygon_pal: RdYlGn
+  polygon_opacity: 0.8
+  raster_pal: RdYlGn
+  raster_opacity: 0.8
+  border_pal: blue
+  border_opacity: 0.3
+  management_row_pal: red
+  choropleths: TRUE
+  map_popup_graph: default_map_graph
+
+
+maps_imports:
+  layer_stopwords: ["geometry", "Lote", "Conjunto_d"]
+
+ms_modals:
+  MS_INTERPOLE: secondary
+  MS_INTERPOLE_SUB_ELEMS: secondary
+  MS_CLASSIFY: secondary
+  MS_DOSER: secondary
+  MS_NEW_API: secondary
+  MS_NEW_ELEM: primary
+  MS_POSTR: secondary
+  MS_NEW_USER: primary
+  MS_EVENT_EDIT: primary
+  MS_PERSONALDATA_EDIT: primary
+  MS_AGRODATA_EDIT: primary
+  MS_AGMET: secondary
+  MS_VARSEL: primary
+  MS_FIELDMANAGR: secondary
+
+
+element_icons:
+  station: "icon_station_brightgreen.png"
+  csv: "icon_csv_blue.png"
+  manual: "icon_manual_lightblue.png"
+  agmet_weather : "icon_weather_bright.png"
+  plant : "icon_tree_green.png"
+  field:  "icon_leaf_green.png"
+
+
+
+###------- ALGORITHM AND ACCESS SETTINGS---------
+
+# code to access the Microservices on the API side - needs to be delivered by odapes
+MS_CODE: "palto123"
+
+# algorithms to be shows to user (note: they also must correspond to code above, ow generates error )
+algorithms:
+  interpole_algos: ["IDW2", "IDW1", "KNN", "Krigins", "ODAPES_Interpole"]
+  classify_algos: ["Equal Distance", "Standard Deviation Classify", "Natural Breaks"]
+  doser_algos: ["Proportional", "Standard Deviation Doser"]
+  allowed_algos: ["IDW2", "IDW1", "KNN","Proportional", "Equal Distance"]
+  interpole_nmin: 3
+  interpole_types: ["WS","AM", "PL", "ME"]
+
+
+
+
+###---- SETTINGS SPECIFIC TO POSTR MESSAGING SYSTEM---------
+# These settings are specific to the messaging system. 
+postr:
+  show_postr_pane: TRUE
+  MSG_AUTHOR: ["ProKambium", "German", "Maximiliano" , "Michael C. Rubin", "Rodrigo Ortega Blu", "ODAPES", "Ali Baba"]
+  MSG_LOGO: ["logo_prokampp_small.png", "user_male.png","user_male.png", "1cf0c4d.jpg", "41ad357.jpg", "odapes.jpg", "avatar.jpg"]
+  MSG_STATUS:
+      "Normal":
+        - "primary"
+      "Urgent":
+        - "danger"
+      "Success":
+        - "success"
+  max_messages: 3
+  priotiries:
+    "MSG_STATUS":
+      ["danger", "primary", "success"]
+    "MSG_DATE_START":
+      - "latest"
+    "MSG_AUTHOR":
+      ["ODAPES","ProKambium", "German", "Maximiliano" , "Rodrigo Ortega Blu",  "Ali Baba", "Michael C. Rubin", ] 
+
+
+###---- API & Data SETTINGS ---------
+
+available_apis: ["Metos Fieldclimate",  "Davis", "AGMET",]
+
+
+metos:
+  max_hours: 168 #the max number of hours the API will be called back, 
+
+agmet:
+  back_overlap: 72
+  element_types:
+    "AGMET Weather":
+      ["C11A", "C21A", "C31A", "C41A", "C42A", "C44A", "C51A"]
+    "AGMET SOIL":
+      ["S11X", "S31X"]

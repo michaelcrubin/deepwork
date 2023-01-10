@@ -1,0 +1,62 @@
+
+
+.content-wrapper>.content {
+ /* background: #FBFBFD;*/
+ 
+}
+
+.info-box .form-group {
+    margin-bottom: 0px;
+}
+
+.info-box p {
+    width: 100%;
+    white-space: break-spaces;
+    line-height: 1.2;
+}
+
+.info-box row {
+    display: block;
+}
+
+
+    
+
+.info-box .progress {
+  background-color: rgba(0,0,0,.125);
+  height: 19px;
+  margin: 5px 0;
+}
+
+.rank-list-item .info-box {
+  margin-bottom: 0;
+  adding: 0.5rem;
+}
+
+.default-sortable .rank-list-item {
+    border-radius: 3px;
+    display: block;
+    padding: 10px 8px 10px 8px !important;
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    overflow: hidden;
+}
+
+.default-sortable.rank-list-container {
+    flex: 1 0 200px;
+    background-color: transparent;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 5px;
+    display: flex;
+    flex-flow: column nowrap;
+    max-height: 80vh;
+    overflow-y: scroll;
+}
+
+.rank-list-container p {
+  margin-bottom: 0;
+  margin-top:0;
+  
+  
+}

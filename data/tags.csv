@@ -1,0 +1,28 @@
+﻿table_id,column,ui_id,color
+long_term_tbl,Status,Done,#527E67
+long_term_tbl,Status,Going Bad,#A31F34
+long_term_tbl,Status,Not started,#D7DBDD
+long_term_tbl,Status,Going Well,#2C5890
+long_term_tbl,Continous,Concluded,#527E67
+long_term_tbl,Continous,Backfall,#A31F34
+long_term_tbl,Continous,keep routine/Manage,#97396C
+long_term_tbl,Continous,In Focus,#2C5890
+,,abc0,#A31F34
+,,abc1,#527E67
+,,abc2,#A31F34
+,,abc3,#6F6659
+,,abc4,#97396C
+,,abc5,#2C5890
+,,abc6,#527E67
+,,abc7,#ffcc00
+,,abc8,#A31F34
+,,abc9,#527E67
+,,abc10,#A31F34
+,,abc11,#97396C
+,,abc12,#2C5890
+,,abc13,#527E67
+,,abc14,#2C5890
+,,abc15,#A31F34
+,,abc16,#527E67
+,,abc17,#ffd480
+,,abc18,#ffffff

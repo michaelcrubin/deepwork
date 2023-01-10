@@ -1,0 +1,215 @@
+/* SPECIAL STYLING FOR META PLATFORM // APP CREATOR (NAVBARPAGE) */
+/* ODAPES COLORS
+    $ColorHead1:#527E67;
+    $ColorHead2: #689C81;
+    $ColorHead3: #ffffff;
+    $ColorBackground: #F7F6F3;
+    $ColorTitles:#6F6659;
+    $ColorUI2:#A3A9BA;
+    $ColorUI1:#2C5890;
+    $ColorEnphasis1:#97396C;
+    $ColorEnphasis2:#A31F34;
+    $ColorFont1: #3B3838;
+    $ColorFont2: #D1D4DC;
+    $theBlueGrad: #5D81B0;
+    $ColorEnphasis1Grad: #AE5B88;
+    $ColorEnphasis2Grad: #AD4C5C;
+    darken($color: #59ae40, $amount: 5%)
+    lighten($color: 689C81, $amount: 30%)
+    SUMMIT BLUE: 005a87, 007cba
+    */
+
+
+/* ----------------------- FOR CENTRALIZED NAVBAR ---------------------------
+SIZES NAVBAR
+total 100%
+Menubar = 75%
+out of this I want to 4,5 menu tabs 
+I also want to have the 4 menus in the center.
+hence i have 75%-4,5*x = space to distribute
+x = 12% (from experience) = all X = 54%
+Delta = 21% of space to divide
+hence I need to have:
+logo + a = 0,5x + b means 
+a + b = 21 and 25% + a = 6% + b
+=>> a = 1% and b = 20%
+
+Attention, this refers to 100% barwidth, need to relate it to 75%
+hence:
+a = 1,333% and b = 16,66%
+x = 16%
+y = 8%
+
+/* logo = 25%
+.navbar-header {
+    float: left;
+    width: 25%;
+}
+
+/*menu part = 75% + left margin 1,3%
+.navbar-default .navbar-nav {
+  float: right;
+  margin: 0;
+  margin-right: -15px;
+  width: 75%;
+  padding-left: 1.3%;
+}
+
+/*menu tab general = 16% 
+.navbar-nav>li {
+  float: left;
+  width: 16%;
+  text-align: center;
+  background-color: transparent;
+  color: #fff;
+  height: 60px;
+}
+
+/*menu tab dropdown = 6,6% 
+#main_tabset .dropdown {
+    float: right !important;
+    background-color: transparent !important;
+    width: 6% !important;
+    margin-right: -3px;
+    font-size: 18px;
+}
+ 
+
+#main_tabset .dropdown-menu {
+    position: absolute;
+    right: 3px;
+    float: right;
+    text-align: right;
+    left: auto;
+}
+
+
+/* ----------------------- FOR CENTRALIZED NAVBAR ---------------------------*/
+
+
+
+
+
+
+/* ----------------------- FOR RIGHT NAVBAR ---------------------------
+SIZES NAVBAR
+total 100%
+Menubar = 75%
+out of this I want to 4,5 menu tabs 
+I also want to have the 4 menus in the center.
+hence i have 75%-4,5*x = space to distribute
+x = 12% (from experience) = all X = 54%
+Delta = 21% of space to divide
+hence I need to have:
+logo + a = 0,5x + b means 
+a + b = 21 and 25% + a = 6% + b
+=>> a = 1% and b = 20%
+
+Attention, this refers to 100% barwidth, need to relate it to 75%
+hence:
+a = 1,333% and b = 16,66%
+x = 16%
+y = 8%
+
+/* logo = 25% */
+.navbar-header {
+    float: left;
+    width: 40%;
+}
+
+/*menu part = 75% + left margin 1,3%*/
+.navbar-default .navbar-nav {
+  float: right;
+  margin-right: -15px;
+}
+
+/*menu tab general = 16% */
+.navbar-nav>li {
+  width: 130px;
+  text-align: center;
+  background-color: transparent;
+  color: #fff;
+  height: 60px;
+}
+
+/*menu tab dropdown = 6,6% */
+#main_tabset .dropdown {
+    float: right !important;
+    background-color: transparent !important;
+    width: 55px !important;
+    margin-right: -3px;
+    font-size: 18px;
+}
+ 
+
+#main_tabset .dropdown-menu {
+    position: absolute;
+    right: 3px;
+    float: right;
+    text-align: right;
+    left: auto;
+}
+
+
+/* ----------------------- FOR RIGHT NAVBAR --------
+
+
+
+/* COLORS */
+.navbar-default {
+  background-color: #689C81;
+}
+
+.navbar-brand {
+    float: left;
+    padding: 0px;
+    font-size: 18px;
+    height: 60px;
+    width: 100%;
+}
+
+.navbar-brand>img {
+    display: block;
+    max-height: 40px;
+    max-width: 100%;
+    height: auto;
+    margin: 10px 15px 10px 15px;
+}
+
+
+.navbar-default .navbar-nav>li>a {
+  color: #fff;
+  margin: 0px 3px 0px 3px;
+  height: 60px;
+}
+
+.navbar-default .navbar-nav>li>a:hover {
+  color: #97396C;
+  background-color: #527E67;
+  border-top: 3px solid #97396C;
+}
+
+.navbar-default .navbar-nav>.active>a:hover {
+  color: #97396C;
+  border-top: 3px solid #97396C;
+  background-color: #527E67;
+  
+}
+
+.navbar-default .navbar-nav>.active>a {
+  color: #fff;
+  border-top: 3px solid #97396C;
+  background-color: #527E67;
+  
+}
+
+.navbar-nav>.active>a {
+  margin: 0px 5px 0px 5px;
+  height: 65px;
+}
+
+.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:focus {
+  color: #fff;
+  border-top: 3px solid #97396C;
+  background-color: #527E67;
+}
