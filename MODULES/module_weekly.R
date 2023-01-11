@@ -91,12 +91,9 @@ Weekly_SERVER <- function(id, r_data, r_control, params) {
     observeEvent(input$week_bucket, {
       input_vec <- input$week_bucket
       req(length(input_vec) > 0)
-      browser()
+
       r_control$update_reactive <- r_data$goal %>% update_sorting(input_vec) %>% 
         store_data_set(r_data$goal)
-      browser()
-      #state <- calc_workload(complete, n_goal, domain)
-      
     })
     
     
@@ -113,21 +110,36 @@ Weekly_SERVER <- function(id, r_data, r_control, params) {
       input_vec %>% purrr::keep(isTRUE) %>% names() %>% paste0("_body")%>% walk(~shinyjs::show(.x))
     })
     
-    ## -----UPDATE TITLE TEXT  + PLOT ----------
+    ## -----RENDERING TITLE TEXT + PLOTS ----------
   
-    output$left_ttl <- renderUI({goal_eval_badge(10, 0.6)})
+    # left title and plots
+    output$left_ttl <- renderUI({
+      workload_recommend_badge(r_data$state$week$workload, 
+                               r_data$state$week$available_gls)
+      })
     
-    output$left_plot <- renderPlotly({mke_percent_pie(percent = 0.6)})        
+    output$left_plot_1 <- renderPlotly({
+      mke_workload_pie(r_data$state$week$workload)
+      })
+    
+    output$left_plot_2 <- renderPlotly({
+      mke_percent_pie(r_data$state$week$progress_tot)
+      })        
       
-      
-    output$right_ttl <- renderUI({goal_eval_badge(10, 0.6)})
     
-    output$right_plot <- renderPlotly({mke_percent_pie(percent = 0.6)})        
+    # right title and plots
+    output$right_ttl <- renderUI({
+      workload_recommend_badge(r_data$state$quarter$workload, 
+                               r_data$state$quarter$available_gls)
+      })
     
+    output$right_plot_1 <- renderPlotly({
+      mke_workload_pie(r_data$state$quarter$workload)
+      })
     
-
-    
-    
+    output$right_plot_2 <- renderPlotly({
+      mke_percent_pie(r_data$state$quarter$progress_tot)
+    })    
 
   })
 }

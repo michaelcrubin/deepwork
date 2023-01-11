@@ -22,7 +22,7 @@ mke_status_badge <- function(Status){
 progress_status <- function(Progress){
   case_when(Progress == 0 ~"secondary", 
             Progress > 0 & Progress < 0.5 ~"danger",
-            Progress > 0.5 & Progress < 1 ~"warning",
+            Progress >= 0.5 & Progress < 1 ~"warning",
             Progress == 1 ~"success"
   )
 }
@@ -46,13 +46,12 @@ mke_progress_bar <- function(ns, goal_id, Progress){
 
 # makes a progress slider (0-100%)
 mke_slider_progress <- function(ns, goal_id, Progress){
-
   shinyWidgets::sliderTextInput(
     inputId = ns(paste0(goal_id, "_progress")),
     label = NULL,#"Progress:",
     choices = (seq(0:100)-1), 
     post = "%", 
-    selected = as.character(Progress* 100)
+    selected = round(Progress* 100, digits = 0) %>% min(100) %>% max(0) %>% as.character()
   )
 }
 
@@ -72,12 +71,35 @@ mke_picker_badges <- function(ns, goal_id, Status){
 }
 
 
+# workload recommendation badge
+workload_recommend_badge <- function(workload, available_gls){
+  
+  if (workload > 1){
+    paste("Eliminate", ceiling(-available_gls), "Goals") %>%
+      dashboardBadge(color = "danger")
+  }
+  else if (workload > 0.75){
+    paste("Focus on Important first") %>%
+      dashboardBadge(color = "warning")
+  }
+  else if (workload < 0.33){
+    paste("You can add", floor(available_gls), "Goals") %>%
+      dashboardBadge(color = "primary")
+  }
+  else {
+    paste("Great Workload Balance") %>%
+      dashboardBadge(color = "success")
+  }
+}
+
 # make a percentage complete plot
-mke_percent_pie <- function(percent){
+mke_percent_pie <- function(progress_tot){
   lwr <- 50
+
+  progress_tot <- OdsDataHelper::zero_or_numeric(progress_tot) %>% max(0) %>% min(1)
   labels = c('Complete', "Incomplete")
-  colors <- ceiling(percent * (255-lwr) + lwr) %>% int_to_hex() %>% complete_zeros(2) %>% paste0('#28a745', .) %>% c('#FFFFFF00')
-  values = c(percent, 1-percent)
+  colors <- ceiling(progress_tot * (255-lwr) + lwr) %>% int_to_hex() %>% complete_zeros(2) %>% paste0('#28a745', .) %>% c('#FFFFFF00')
+  values = c(progress_tot, 1 - progress_tot)
   
   m <- list(
     l = 0,
@@ -90,22 +112,25 @@ mke_percent_pie <- function(percent){
   plot_ly(type='pie',
           labels=labels,
           values=values,
+          sort = FALSE,
           hole = 0.6,
+          width = 85, height = 85,
           textinfo='none',
+          hoverinfo = 'none',
           marker = list(colors = colors, line = list(color = '#FFFFFF', width = 0)),
           showlegend = F) %>% 
     layout(autosize = F, 
-           margin = m, width = 85, height = 85,
+           margin = m,
            plot_bgcolor='transparent',
            paper_bgcolor='transparent'
            ) %>%
     add_annotations(
-      text = (paste0(percent * 100, "%")),
+      text = (paste0(round(progress_tot * 100, digits = 0), "%")),
       showarrow = FALSE,
       # Styling annotations' text:
       font = list(color = '#28a745',
                   family = 'Impact',
-                  size = 40)
+                  size = 30)
     ) %>%
     config(
       displaylogo = FALSE,displayModeBar = FALSE
@@ -116,7 +141,10 @@ mke_percent_pie <- function(percent){
 
 
 # make a percentage complete plot
-mke_charge_pie <- function(workload){
+mke_workload_pie <- function(workload){
+  
+  value <- round(workload * 100, digits = 0)
+  
   m <- list(
     l = 0,
     r = 0,
@@ -124,19 +152,21 @@ mke_charge_pie <- function(workload){
     t = 0,
     pad = 0
   )
-  workload <- 67
   plot_ly(
-    domain = list(x = c(0, 1), y = c(0, 1)),
-    value = workload,
+  #  domain = list(x = c(0, 0.5), y = c(0, 1)),
+    value = value,
+    width = 110, height = 100,
     number = list(suffix = "%"), 
-    title = list(text = "Workload"),
+    #title = list(text = "Workload"),
+    title = NULL,
+    
     type = "indicator",
     mode = "gauge+number",
     gauge = list(
       bar = list(color = "#001f3f"),
-      axis =list(range = list(NULL, 150)),
+      axis =list(range = list(0, 150)),
       bgcolor = "transparent",
-      borderwidth = 1,
+      borderwidth = 0,
       bordercolor = "gray",
       steps = list(
         list(range = c(0, 25), color = "#adb5bd80"),
@@ -146,10 +176,10 @@ mke_charge_pie <- function(workload){
       threshold = list(
         line = list(color = "#001f3f", width = 3),
         thickness = 3,
-        value = workload)))%>%
+        value = value)))%>%
     layout(autosize = F,
            font = list(family = "Arial"),
-           margin = m, width = 100, height = 150,
+           margin = m,
            plot_bgcolor='transparent',
            paper_bgcolor='transparent'
     ) %>%
@@ -163,76 +193,21 @@ mke_charge_pie <- function(workload){
 
 ## UI ------------ GOAL BOXES --------------------
 
-get_states <- function(X, domain){
-  Y <- X %>% filter_goals(domain)
-  
- calc_state(sum(Y$open_h, na.rm = T),
-                  n_goal = nrow(Y),
-                  av_h_gls = mean(Y$work_h, na.rm = T),
-                  domain = domain)
-  
-}
 
-# calculates the workload from completed % and n goals
-calc_state <- function(open_h_tot = open_h_tot, n_goal, av_h_gls = NULL, domain = "week", h_day = 8){
-
-  # param
-  # complete <- 0.95
-  #n_goal<- 20
-  av_h_gls = ifelse(is.null(av_h_gls), 5, av_h_gls)
- # gls_open <- n_goal * (1 - complete)
-  
- # open_h_tot <- sum(open_h)
-
-  tot_h <- switch(domain,
-                   "week" = {(6 - lubridate::wday(Sys.time())) * h_day},
-                   
-                   "quarter" = {((90 - lubridate::yday(Sys.time()) %% 90) / 7 * 5) * h_day},
-                   
-                   {0}
-         )
-  # dys_av * gls_day
-  # ceiling((gls_open - dys_av * gls_day))
-  # floor((dys_av * gls_day) - gls_open)
-  
-  
-  list(
-    open_h = open_h_tot,
-    available_gls = (tot_h - open_h_tot) / av_h_gls,
-    workload = (open_h_tot / tot_h)
-  )
-}
-
-goal_eval_badge <- function(workload, excess_gls){
-
-  if (workload > 1){
-    paste("Excess of Workload // Eliminate", ceiling(state$excess_gls), "Goals") %>%
-      dashboardBadge(color = "danger")
-  }
-  else if (workload > 0.75){
-    paste("Challenging Workload // Focus on Important first") %>%
-      dashboardBadge(color = "warning")
-  }
-  else if (workload < 0.33){
-    paste("Low Workload // You can add", floor(-excess_gls), "Goals") %>%
-      dashboardBadge(color = "primary")
-  }
-  else {
-    paste("Great Workload Balance") %>%
-      dashboardBadge(color = "success")
-  }
-}
 # https://plotly.com/r/gauge-charts/
 mke_bucket_ttl <- function(ttl, suffix, ns){
   
   tagList(
     fluidRow(style = "margin-left:0px; margin-right:0px; height:110px;",
-      column(width = 9,
+      column(width = 6,
              fluidRow(h4(ttl)),
              fluidRow(shiny::uiOutput(ns(paste0(suffix, "_ttl"))))
       ),
       column(width = 3, style = "text-align:right;",
-      plotlyOutput(ns(paste0(suffix, "_plot")), height = '90px', width = '90px'),
+             plotlyOutput(ns(paste0(suffix, "_plot_1")), height = '85px', width = '90px'),
+      ),
+      column(width = 3, style = "text-align:right;",
+             plotlyOutput(ns(paste0(suffix, "_plot_2")), height = '85px', width = '90px'),
       )
   )
   )
@@ -318,26 +293,23 @@ mke_goal_box <- function(X, ...){
 
 ## DATA ------------ HANDLING HELPER --------------------
 
-
 # filters the goal dataset accoridng to the criteria
 filter_goals <- function(X, filter = NULL){
-
-  print(paste("Filter", filter))
   switch(filter,
          
          "day" = {X %>% dplyr::filter(quarter & week & day)},
          
          "week" = {X %>% dplyr::filter(quarter & week)},
          
-         "week_only" = {X %>% dplyr::filter(quarter & week & !day)},
+         "week_only" = {X %>% dplyr::filter(quarter & week & !day)}, # this is used on rhs in day pane
          
          "quarter" = {X %>% dplyr::filter(quarter)},
          
-         "quarter_only" = {X %>% dplyr::filter((quarter) & !(week) & !(day))},
+         "quarter_only" = {X %>% dplyr::filter((quarter) & !(week) & !(day))}, # this is used on rhs in week pane
          
-         "all_complete" = {X %>% dplyr::filter(!quarter & Status != "Done")},
+         "all_incomplete" = {X %>% dplyr::filter(!quarter & Status != "Done")},  # this is used on rhs in quarter pane
          
-         "all" = {X},
+         "all" = {X}, 
          
          {NULL}
          
@@ -353,20 +325,44 @@ filter_goals <- function(X, filter = NULL){
   #  return(Y)
 }
 
+# calculates the available work hours for a domain
+domain_work_h <- function(domain, h_day = 8){
+
+  tot_h <- switch(sub("_.*", "", domain),
+                  
+                  "day" = {19 - lubridate::hour(Sys.time()) %>% max(8)},
+                  
+                  "week" = {(6 - lubridate::wday(Sys.time())) * h_day},
+                  
+                  "quarter" = {((90 - lubridate::yday(Sys.time()) %% 90) / 7 * 5) * h_day},
+                  
+                  "all" = {difftime(as.POSIXct("2027-11-09"), as.POSIXct(Sys.time()), units="weeks") %>% as.numeric() %>% 
+                      magrittr::divide_by(52) %>% magrittr::multiply_by(46) %>% magrittr::multiply_by(40)},
+                  
+                  {0}
+  )
+}
+
 # Updates the Goal dataset for a given column and a provided input vector
 update_data_set <- function(X, input_vec, col){
   print("updating Data")
   row <- names(input_vec)
-  value <- unlist(input_vec, use.names = F)
+  
+  if (col == "Progress"){
+    value <- unlist(input_vec, use.names = F) %>% as.integer() %>% magrittr::divide_by(100) %>% round(digits = 2)
+  } else {
+    value <- unlist(input_vec, use.names = F)
+  }
   Y <- X %>% dplyr::rows_update(tibble(goal_id = row, {{col}} := value), by = "goal_id")
   return(Y)
+
 }
 
 # updates list according to sorting
 update_sorting <- function(X, input_vec){
   # hierarchy escalation
   print("Sorting update")
-  browser()
+
   input_vec <- input_vec %>% OdsDataHelper::discard_by_name("is_all") 
   input_vec$week <- c(input_vec$week, input_vec$day)
   input_vec$quarter <- c(input_vec$quarter, input_vec$week)
@@ -390,6 +386,38 @@ store_data_set <- function(new, old = NULL){
 listen_to <- function(X, input, filter, suffix){
   X %>% filter_goals(filter) %>% dplyr::mutate(ui_id = paste0(goal_id, suffix))%>%
     dplyr::mutate(value = map(ui_id, ~input[[.x]])) %>% OdsDataHelper::df_to_lst(vals = "value", nms = "goal_id")
+}
+
+#runs all state calcs
+get_all_states <- function(X, domains){
+  ret <- map(domains, ~iterate_states(.x, X)) %>% setNames(domains)
+}
+
+# is the iterator for all states
+iterate_states <- function(domain, X, ...){
+  Y <- X %>% filter_goals(domain)
+  calc_state(
+    open_h = Y$open_h,
+    work_h = Y$work_h,
+    n_goal = nrow(Y),
+    av_h_gls = mean(X$work_h, na.rm = T),
+    domain = domain
+    )
+}
+
+# calculates the workload and complete State
+calc_state <- function(open_h, work_h, n_goal, av_h_gls = NULL, domain = "week", ...){
+  work_h_tot <- sum(work_h, na.rm = TRUE)
+  open_h_tot <- sum(open_h, na.rm = TRUE)
+  av_h_gls = ifelse(is.null(av_h_gls), 5, mean(av_h_gls, na.rm = TRUE))  # param
+  tot_h <- domain_work_h(domain, ...)
+
+  list(
+    workload = (open_h_tot / tot_h),
+    progress_tot = (1 - sum(open_h_tot) / sum(work_h_tot)),
+    open_h = open_h_tot,
+    available_gls = (tot_h - open_h_tot) / av_h_gls
+  )
 }
 
 

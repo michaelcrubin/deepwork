@@ -59,6 +59,9 @@ get_params <- function(){
     ui_data = list(
       text_tags = read_csv(here("data", "tags.csv")),
       category_style = read_csv(here("data", "category_style.csv"))
+    ),
+    system_params = list(
+      domains = c("day", "week_only", "week", "quarter_only", "quarter","all_incomplete","all")
     )
   )
 }
@@ -72,14 +75,13 @@ get_r_control<-function(){
   )
   return(r_control)
 }
-get_r_data <- function(){
+get_r_data <- function(params){
   goal = read_csv(here("data", "goal.csv")) %>% mutate(open_h = (1 - Progress) * work_h)
-  state_week = get_states(goal, "week")
-  state_quarter = get_states(goal, "quarter")
+  state <- get_all_states(goal, params$system_params$domains)
+
   r_data <- reactiveValues(
     goal = goal,
-    state_week = state_week,
-    state_quarter = state_quarter
+    state = state
   )
 
   return(r_data)
@@ -237,13 +239,14 @@ shinyApp(
   server = function(input, output) {
     
     r_control <- get_r_control()
-    r_data <- get_r_data()
+    r_data <- get_r_data(params)
     
     observeEvent(r_control$update_reactive, {
       req(r_control$update_reactive)
       print("reimporting")
       # Later more fine graned
-      r_data$goal <- read_csv(here("data", "goal.csv"))
+      r_data$goal <- read_csv(here("data", "goal.csv")) %>% mutate(open_h = (1 - Progress) * work_h)
+      r_data$state <- get_all_states(r_data$goal, params$system_params$domains)
     })
     
     # Weekly server logic
