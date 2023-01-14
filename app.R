@@ -225,7 +225,16 @@ shinyApp(
       tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "CSS/prov_css.css")),
       useShinyjs(),
       
+      
+      
       tabItems(
+        
+        tabItem(
+          tabName =  "day_id",
+          
+          
+        ),
+        
         tabItem(tabName = "weekly_id", Weekly_UI("weekly_id", params)),
         
        #tabItem(tabName = "quarterly_id", Quarterly_UI("quarterly_id", params)),
@@ -236,7 +245,7 @@ shinyApp(
   ),
 
 ### SERVER PART-----------------------
-  server = function(input, output) {
+  server = function(input, output, session) {
     
     r_control <- get_r_control()
     r_data <- get_r_data(params)

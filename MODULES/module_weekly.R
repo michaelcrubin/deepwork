@@ -9,11 +9,11 @@ Weekly_UI <- function(id, params) {
       column(10, offset = 0,
              shiny::fluidRow(shiny::h2("Weekly Focus")),
              shiny::fluidRow(shiny::h5("Select Objectives of actual Week"))
-      ),
-      column(width = 2,
-             shiny::fluidRow(shiny::h6("Edit Mode")),
-             shiny::fluidRow(switchInput(inputId = ns("edit_mode"), value = TRUE))
       )
+      # column(width = 2,
+      #        shiny::fluidRow(shiny::h6("Edit Mode")),
+      #        shiny::fluidRow(switchInput(inputId = ns("edit_mode"), value = TRUE))
+      # )
     ),
     fluidRow(
       column(width = 12,
@@ -31,13 +31,14 @@ Weekly_SERVER <- function(id, r_data, r_control, params) {
     ##-------------- APERO----------------
     ns <- session$ns
 
+    
     ## -----BUCKET RENDERER ----------
     output$goal_list <- renderUI({
       	#https://community.rstudio.com/t/shiny-sortable-how-to-limit-number-of-items-that-can-be-dropped/69233/2
       print("rendering")
-
-      a <- filter_goals(r_data$goal, "week") %>% mke_goal_box(input$edit_mode, params, ns)
-      b <- filter_goals(r_data$goal, "quarter_only") %>% mke_goal_box(input$edit_mode, params, ns)
+      goal <- isolate(r_data$goal)
+      a <- filter_goals(goal, "week") %>% mke_goal_box(input$edit_mode, params, ns)
+      b <- filter_goals(goal, "quarter_only") %>% mke_goal_box(input$edit_mode, params, ns)
 
       x <-bucket_list(
         header = NULL,
@@ -57,57 +58,90 @@ Weekly_SERVER <- function(id, r_data, r_control, params) {
           labels = b
         )
       )
-      
       return(x)
-
     })
+    
+    # initial progressbar rendering
+    observe({
+      print("renders all bars")
+      render_progress_bar(isolate(r_data$goal), output)
+    })
+    
+    # initial statusbadge rendering
+    observe({
+      print("renders all badges")
+      render_status_badge(isolate(r_data$goal), output)
+    })
+
     
     ## -----PROGRESS UPDATE ----------
     # listen to update inputs (slider)
-    progress_listener_d <- reactive({r_data$goal %>% listen_to(input, "quarter", "_progress")}) %>% debounce(500)
-    
-    # observe and Call Update for Progress
+    progress_listener_d <- reactive({
+      r_data$goal %>% listen_to(input, "quarter", "_progress", "df") %>% 
+        mutate(old_Progress = Progress) %>%
+        mutate(Progress = as.numeric(value) / 100) %>% 
+        mutate(change = Progress != old_Progress) %>% dplyr::filter(change)
+      }) %>% debounce(500)
+  
+    # observe progress slider and update + save Dataset + update bar
     observe({
-      input_vec <- progress_listener_d() %>% purrr::discard(is.null)
-      req(length(input_vec) > 0)
-      r_control$update_reactive <- r_data$goal %>% update_data_set(input_vec, "Progress") %>% 
-        store_data_set(r_data$goal)
+      input_df <- progress_listener_d()
+      req(nrow(input_df) > 0)
+      
+      # storing the data
+      r_control$update_reactive <- r_data$goal %>% save_df_join(update = input_df) %>%
+        store_data_set(old = r_data$goal)
+      
+      # updating the progress bars
+      render_progress_bar(input_df, output)
     })
+
     
     ## -----STATUS UPDATE ----------
     # listen to update inputs (slider)
-    status_listener <- reactive({r_data$goal %>% listen_to(input, "quarter", "_status")})
-    
-    # observe and Call Update for Progress
-    observe({
-      input_vec <- status_listener() %>% purrr::discard(is.null)
-      req(length(input_vec) > 0)
-      r_control$update_reactive <- r_data$goal %>% update_data_set(input_vec, "Status") %>% 
-        store_data_set(r_data$goal)
+    status_listener <- reactive({
+      r_data$goal %>% listen_to(input, "quarter", "_status", "df") %>% 
+        mutate(old_Status = Status) %>%
+        mutate(Status = value) %>% 
+        mutate(change = Status != old_Status) %>% dplyr::filter(change)
     })
     
+    # observe progress slider and update + save Dataset + update bar
+    observe({
+      input_df <- status_listener()
+      req(nrow(input_df) > 0)
+      # storing the data
+      r_control$update_reactive <- r_data$goal %>% save_df_join(update = input_df) %>%
+        store_data_set(old = r_data$goal)
+      
+      # updating the progress bars
+      render_status_badge(input_df, output)
+    })
+    
+    
     ## -----SORTING UPDATE ----------
-
+    # when user rearranges buckets, reacts and stores in DB
     observeEvent(input$week_bucket, {
       input_vec <- input$week_bucket
       req(length(input_vec) > 0)
-
       r_control$update_reactive <- r_data$goal %>% update_sorting(input_vec) %>% 
         store_data_set(r_data$goal)
     })
     
     
     ## -----SHOW AND HIDE DETAILS ----------
-    
     # listen to toggle inputs
-    toggle_listener <- reactive({r_data$goal %>% listen_to(input, "quarter", "_toggle")})
+    toggle_listener <- reactive({
+      a<- r_data$goal %>% listen_to(input, "quarter", "_toggle") %>% purrr::modify(as.logical)
+      })
+
     
     # observe to toggle the Detail section
     observe({
-      input_vec <- toggle_listener() %>% purrr::discard(is.null)
+      input_vec <- toggle_listener()
       req(length(input_vec) > 0)
-      input_vec %>% purrr::keep(isFALSE) %>% names() %>% paste0("_body")%>% walk(~shinyjs::hide(.x))
-      input_vec %>% purrr::keep(isTRUE) %>% names() %>% paste0("_body")%>% walk(~shinyjs::show(.x))
+      print("toggle all edits")
+      input_vec %>% iwalk(~toggle_edit_mode(id = .y, flag = .x))
     })
     
     ## -----RENDERING TITLE TEXT + PLOTS ----------

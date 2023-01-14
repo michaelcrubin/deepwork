@@ -1,21 +1,20 @@
 goal_id,quarter,week,day,Activity,Project,Category,Status,Continous,Progress,work_h,Planned,Concluded,Description,Criteria,Comment,open_h
-gl00080,TRUE,FALSE,FALSE,Reduce Alcohol 3,Alcohol,Health & Lifestyle,Done,NA,0,5,30.06.23,NA,Reduce Alcohol: be completely off alcohol,NA,NA,5
-gl00082,TRUE,FALSE,FALSE,Spire,Plan,General,Not started,NA,0.93,5,31.03.23,NA,Life Plan in SPIRE format // add emotional well being // conclude,NA,NA,0.34999999999999976
-gl00077,TRUE,FALSE,FALSE,Housing Long Term,Plan,Housing Structure Routines,Going Well,NA,1,5,31.12.23,NA,Solve the long-term housing Housing question,NA,NA,0
-gl00084,TRUE,FALSE,FALSE,Income Streams 3,DiverseInvest,Job & Purpose,Not started,NA,0.3,5,31.12.22,NA,Find 1-3 Short-Term income stream to cover all costs,USD 7500 per quarter,possibly to be replaced by ODAPES,3.5
-gl00088,TRUE,FALSE,FALSE,Electrical curtins,HomeRetro,Housing Structure Routines,Going Well,In Focus,0.14,5,30.06.22,NA,Install Electrical curtains in the Sleeping room,NA,NA,4.3
 gl00085,TRUE,FALSE,FALSE,Eat Variety,EatHealth,Health & Lifestyle,Not started,NA,0.3,5,01.04.24,NA,Eat a big variety (requires the app to be ready),at least 30 different species per month,NA,3.5
-gl00086,TRUE,FALSE,FALSE,Kill the depression wo medics,MentalHealth,Health & Lifestyle,Going Well,In Focus,0.3,5,30.06.23,NA,Reduces medics to zero and kill finally the depression.,No more medics + stable mood,Mostly linked to alcohol consumption,3.5
 gl00081,TRUE,FALSE,FALSE,Personal Brand,DiverseInvest,Job & Purpose,Not started,NA,0,5,30.06.23,NA,"Define Personal Branding (slogan, story, resume etc..)",a short Branding Deck,NA,5
+gl00077,TRUE,FALSE,FALSE,Housing Long Term,Plan,Housing Structure Routines,Done,NA,1,5,31.12.23,NA,Solve the long-term housing Housing question,NA,NA,0
 gl00087,TRUE,FALSE,FALSE,ODS Stable Version,ODAPES,Job & Purpose,Going Well,In Focus,0.3,5,31.07.22,NA,Code stable version in Odapes,"commit, release done",NA,3.5
 gl00076,TRUE,FALSE,FALSE,Kids,Plan,Family & Relationships,Going Bad,NA,0.43,5,30.06.22,NA,Decide what to do with kids,NA,NA,2.8500000000000005
 gl00083,TRUE,FALSE,FALSE,Red meat to 0,EatHealth,Health & Lifestyle,Not started,NA,0.3,5,31.12.23,NA,Reduce red meat to practical zero,Exceptions 2x per month out-of-home,NA,3.5
-gl00089,TRUE,FALSE,FALSE,Ibirapuera Jogging,"Carina, Sport",Health & Lifestyle,Going Well,In Focus,0.47,5,30.06.22,NA,Restart Jogging in Ibirapuera Evenings,NA,NA,2.6500000000000004
-gl00090,TRUE,FALSE,FALSE,ODS Programmer R,ODAPES,Job & Purpose,Going Well,In Focus,1,5,30.06.22,NA,"ODAPES: Find, hire and train junior R Programmer","hired, first salary paid",NA,0
-gl00078,TRUE,TRUE,FALSE,Sauna+Wellness,"HomeRetro, Wellness",Health & Lifestyle,Going Well,NA,0.51,5,31.12.22,NA,Home Retrofit: revitalize sauna and wellness area,NA,NA,2.5
-gl00079,TRUE,TRUE,FALSE,Reduce Alcohol 2,Alcohol,Health & Lifestyle,Not started,In Focus,0.5,5,31.12.22,NA,Reduce Alcohol: to 1 x per month + find substitute,"1 day per month, no exceptions, also find substitute for other events (alcohol free beer)",NA,2.5
-gl00091,FALSE,FALSE,TRUE,No sugar,EatHealth,Health & Lifestyle,Done,In Focus,0,5,30.09.22,NA,Break completely with added sugar / only d,NA,NA,5
-gl00092,FALSE,FALSE,TRUE,Train Sergio,ODAPES,Job & Purpose,Going Well,In Focus,1,5,30.06.22,NA,ODAPES: Lead and Train Sergio to become autonomous and efficient,NA,NA,0
+gl00078,TRUE,FALSE,FALSE,Sauna+Wellness,"HomeRetro, Wellness",Health & Lifestyle,Not started,NA,1,5,31.12.22,NA,Home Retrofit: revitalize sauna and wellness area,NA,NA,0
+gl00082,TRUE,TRUE,FALSE,Spire,Plan,General,Not started,NA,1,5,31.03.23,NA,Life Plan in SPIRE format // add emotional well being // conclude,NA,NA,0
+gl00080,TRUE,TRUE,FALSE,Reduce Alcohol 3,Alcohol,Health & Lifestyle,Going Well,NA,0.77,5,30.06.23,NA,Reduce Alcohol: be completely off alcohol,NA,NA,1.15
+gl00086,TRUE,TRUE,FALSE,Kill the depression wo medics,MentalHealth,Health & Lifestyle,Going Well,In Focus,0.3,5,30.06.23,NA,Reduces medics to zero and kill finally the depression.,No more medics + stable mood,Mostly linked to alcohol consumption,3.5
+gl00084,TRUE,TRUE,FALSE,Income Streams 3,DiverseInvest,Job & Purpose,Going Well,NA,0,5,31.12.22,NA,Find 1-3 Short-Term income stream to cover all costs,USD 7500 per quarter,possibly to be replaced by ODAPES,5
+gl00089,FALSE,FALSE,FALSE,Ibirapuera Jogging,"Carina, Sport",Health & Lifestyle,Going Well,In Focus,0.47,5,30.06.22,NA,Restart Jogging in Ibirapuera Evenings,NA,NA,2.6500000000000004
+gl00090,FALSE,FALSE,FALSE,ODS Programmer R,ODAPES,Job & Purpose,Going Well,In Focus,1,5,30.06.22,NA,"ODAPES: Find, hire and train junior R Programmer","hired, first salary paid",NA,0
+gl00079,FALSE,FALSE,FALSE,Reduce Alcohol 2,Alcohol,Health & Lifestyle,Not started,In Focus,0.57,5,31.12.22,NA,Reduce Alcohol: to 1 x per month + find substitute,"1 day per month, no exceptions, also find substitute for other events (alcohol free beer)",NA,2.1500000000000004
+gl00091,FALSE,FALSE,FALSE,No sugar,EatHealth,Health & Lifestyle,Done,In Focus,0,5,30.09.22,NA,Break completely with added sugar / only d,NA,NA,5
+gl00092,FALSE,FALSE,FALSE,Train Sergio,ODAPES,Job & Purpose,Going Well,In Focus,1,5,30.06.22,NA,ODAPES: Lead and Train Sergio to become autonomous and efficient,NA,NA,0
 gl00001,FALSE,FALSE,FALSE,First Salary ODAPES,ODAPES,Job & Purpose,Done,Concluded,0.3,5,30.09.22,07.09.22,Pay myself a first salary (~2000$) from ODAPES business,money on account,NA,3.5
 gl00002,FALSE,FALSE,FALSE,Legal Mess 3,Legal,Job & Purpose,Done,Concluded,0.3,5,30.09.22,NA,Banking / Credit Card issues / recover pin company card // cc company // cc itau // inter Carinas cc,At least 2 payment options international,need to be done Banking before Chile,3.5
 gl00003,FALSE,FALSE,FALSE,Gym Carina,"Carina, Sport",Family & Relationships,Done,Backfall,0.3,5,31.03.22,30.03.22,"Go to Gym with Carina, go regularly on the morning",NA,NA,3.5
@@ -91,3 +90,4 @@ gl00072,FALSE,FALSE,FALSE,Dishes Net0,EatHealth,Health & Lifestyle,Not started,N
 gl00073,FALSE,FALSE,FALSE,Income Streams 2,DiverseInvest,Job & Purpose,Not started,NA,0.3,5,30.09.22,NA,Find 1-3 Short-Term income stream to break even,USD 6000 per quarter,possibly to be replaced by ODAPES,3.5
 gl00074,FALSE,FALSE,FALSE,ODS Meta Platform,ODAPES,Job & Purpose,Not started,NA,0.3,5,31.03.23,NA,ODAPES: set-up meta platform + low cost product,NA,Rush: need to be one by Agrishow,3.5
 gl00075,FALSE,FALSE,FALSE,Best Foods,EatHealth,Health & Lifestyle,Not started,NA,0.3,5,31.03.23,NA,"Study the best foods (inflammatory, blood sugar and LDL). Make a list of that foods available in Brazil and create a set of menus .",inside the app,NA,3.5
+gl00088,FALSE,FALSE,FALSE,Electrical curtins,HomeRetro,Housing Structure Routines,Going Well,In Focus,0.5,5,30.06.22,NA,Install Electrical curtains in the Sleeping room,NA,NA,2.5

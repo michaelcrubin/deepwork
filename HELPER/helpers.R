@@ -3,7 +3,7 @@
 ## UI ------------ GENERAL ELEMENTS --------------------
 
 ## Badges for Status (red, green, yellow, grey)
-mke_status_badge <- function(Status){
+mke_status_badge <- function(Status, ...){
   switch(Status,
          
          "Done" = {dashboardBadge(Status, color = "success")},
@@ -28,9 +28,9 @@ progress_status <- function(Progress){
 }
 
 # makes a progress bar
-mke_progress_bar <- function(ns, goal_id, Progress){
+mke_progress_bar <- function(goal_id, Progress, ...){
   shinyWidgets::progressBar(
-    id = ns(paste0(goal_id, "_bar")),
+    id = paste0(goal_id, "_bar"),
     value = Progress * 100,
     # total = 100,
     display_pct = TRUE,
@@ -70,11 +70,13 @@ mke_picker_badges <- function(ns, goal_id, Status){
   )
 }
 
-
 # workload recommendation badge
 workload_recommend_badge <- function(workload, available_gls){
   
-  if (workload > 1){
+  if (!check_value(workload)){
+    return(NULL)
+  }
+  else if (workload > 1){
     paste("Eliminate", ceiling(-available_gls), "Goals") %>%
       dashboardBadge(color = "danger")
   }
@@ -139,7 +141,6 @@ mke_percent_pie <- function(progress_tot){
   
 }
 
-
 # make a percentage complete plot
 mke_workload_pie <- function(workload){
   
@@ -190,9 +191,7 @@ mke_workload_pie <- function(workload){
 
 
 
-
 ## UI ------------ GOAL BOXES --------------------
-
 
 # https://plotly.com/r/gauge-charts/
 mke_bucket_ttl <- function(ttl, suffix, ns){
@@ -221,11 +220,11 @@ mke_header <- function(ns, goal_id, Activity, Project){
              fluidRow(h4(Activity)),
              fluidRow(h6(Project))
       ),
-      column(width = 2, 
+      column(width = 2, style = "padding-left: 0px; padding-right: 0px;",
              switchInput(
                inputId = ns(paste0(goal_id, "_toggle")),
-               onLabel = icon("eye"),
-               offLabel = icon("eye"),
+               onLabel = icon("edit"),
+               offLabel = icon("edit"),
                size = "mini"
              )
       )
@@ -252,11 +251,13 @@ mke_body <- function(ns, goal_id, Description, Criteria){
 
 # makes the footer with UI elements (edit or fix mode) for box
 mke_footer <- function(ns, goal_id, Progress, Status, edit_mode = FALSE){
-  if (isTRUE(edit_mode)){
-    fluidRow(column(width = 8, mke_slider_progress(ns, goal_id, Progress)), column(width = 4, mke_picker_badges(ns, goal_id, Status)))
-  } else {
-    fluidRow(column(width = 8, mke_progress_bar(ns, goal_id, Progress)), column(width = 4, mke_status_badge(Status)))
-  }
+  tagList(
+    fluidRow(id = ns(paste0(goal_id, "_edit_mode")), column(width = 8, mke_slider_progress(ns, goal_id, Progress)), column(width = 4, mke_picker_badges(ns, goal_id, Status))),
+    fluidRow(id = ns(paste0(goal_id, "_view_mode")),
+      column(width = 8, shiny::uiOutput(ns(paste0(goal_id, "_bar")))),
+      column(width = 4, shiny::uiOutput(ns(paste0(goal_id, "_status"))))
+      )
+  )
 }
 
 # makes box content of a Box
@@ -325,37 +326,47 @@ filter_goals <- function(X, filter = NULL){
   #  return(Y)
 }
 
-# calculates the available work hours for a domain
-domain_work_h <- function(domain, h_day = 8){
-
-  tot_h <- switch(sub("_.*", "", domain),
-                  
-                  "day" = {19 - lubridate::hour(Sys.time()) %>% max(8)},
-                  
-                  "week" = {(6 - lubridate::wday(Sys.time())) * h_day},
-                  
-                  "quarter" = {((90 - lubridate::yday(Sys.time()) %% 90) / 7 * 5) * h_day},
-                  
-                  "all" = {difftime(as.POSIXct("2027-11-09"), as.POSIXct(Sys.time()), units="weeks") %>% as.numeric() %>% 
-                      magrittr::divide_by(52) %>% magrittr::multiply_by(46) %>% magrittr::multiply_by(40)},
-                  
-                  {0}
-  )
-}
-
-# Updates the Goal dataset for a given column and a provided input vector
-update_data_set <- function(X, input_vec, col){
-  print("updating Data")
-  row <- names(input_vec)
-  
-  if (col == "Progress"){
-    value <- unlist(input_vec, use.names = F) %>% as.integer() %>% magrittr::divide_by(100) %>% round(digits = 2)
-  } else {
-    value <- unlist(input_vec, use.names = F)
+# This joins two DFs savely by checking col names and types or it deletes n rows
+# X is the master DF. Add is a DF to join withb possibly different structure
+# delete are n ids which are deleted
+# update a row by replacing the entire row
+save_df_join <- function(X, add = NULL, update = NULL, delete = NULL){
+  if (!all(is.null(add))){
+    # filter the colnames 
+    add <- add %>% dplyr::select(any_of(colnames(X)))
+    # get column names
+    colnms <- names(add)[names(add) %in% names(X)]
+    # transforms all column names into same format
+    add[colnms] <- lapply(colnms, function(x) {
+      match.fun(paste0("as.", class(X[[x]])[1]))(add[[x]])
+    })
+    # joining sets
+    Z <- X %>% dplyr::bind_rows(add)
   }
-  Y <- X %>% dplyr::rows_update(tibble(goal_id = row, {{col}} := value), by = "goal_id")
-  return(Y)
-
+  if (!all(is.null(update))){
+    # filter the colnames 
+    update <- update %>% dplyr::select(any_of(colnames(X)))
+    # get column names
+    colnms <- names(update)[names(update) %in% names(X)]
+    # transforms all column names into same format
+    update[colnms] <- lapply(colnms, function(x) {
+      match.fun(paste0("as.", class(X[[x]])[1]))(update[[x]])
+    })
+    # joining sets
+    id <- OdsDataHelper::find_column(X, what = "id")
+    # deleting old row
+    Y <- X %>% dplyr::filter(!(.data[[id]] %in% update[[id]]))
+    # adding new row
+    Z <- Y %>% dplyr::bind_rows(update)
+  }
+  
+  if (!all(is.null(delete))){
+    # finding out which colname is id
+    id <- OdsDataHelper::find_column(X, what = "id")
+    # deleting
+    Z <- X %>% dplyr::filter(!(.data[[id]] %in% delete))
+  }
+  return(Z)
 }
 
 # updates list according to sorting
@@ -383,20 +394,55 @@ store_data_set <- function(new, old = NULL){
 }
 
 # this listens to the input list given a certain id filter and id suffix
-listen_to <- function(X, input, filter, suffix){
-  X %>% filter_goals(filter) %>% dplyr::mutate(ui_id = paste0(goal_id, suffix))%>%
-    dplyr::mutate(value = map(ui_id, ~input[[.x]])) %>% OdsDataHelper::df_to_lst(vals = "value", nms = "goal_id")
+listen_to <- function(X, input, filter, suffix, format = "list"){
+  if (format == "list") {
+    X %>% filter_goals(filter) %>% dplyr::mutate(ui_id = paste0(goal_id, suffix)) %>%
+      dplyr::mutate(value = map_chr(ui_id, ~as.character(ifelse(length(input[[.x]]) == 0, NA,input[[.x]])))) %>% drop_na(value) %>%
+      OdsDataHelper::df_to_lst(vals = "value", nms = "goal_id")
+  } else if (format == "df"){
+    X %>% filter_goals(filter) %>% dplyr::mutate(ui_id = paste0(goal_id, suffix)) %>%
+      dplyr::mutate(value = map_chr(ui_id, ~as.character(ifelse(length(input[[.x]]) == 0, NA,input[[.x]])))) %>% drop_na(value)
+  } else {
+    NULL
+  }
 }
+
+## LOGIC --------- STATUS CALCULATIONS --------------------
+
+
+# calculates the available work hours for a domain
+domain_work_h <- function(domain, h_day = 8){
+  
+  tot_h <- switch(sub("_.*", "", domain),
+                  
+                  "day" = {19 - lubridate::hour(Sys.time()) %>% max(8)},
+                  
+                  "week" = {(6 - lubridate::wday(Sys.time())) * h_day},
+                  
+                  "quarter" = {((90 - lubridate::yday(Sys.time()) %% 90) / 7 * 5) * h_day},
+                  
+                  "quarter1" = {5},
+                  
+                  
+                  "all" = {difftime(as.POSIXct("2027-11-09"), as.POSIXct(Sys.time()), units="weeks") %>% as.numeric() %>% 
+                      magrittr::divide_by(52) %>% magrittr::multiply_by(46) %>% magrittr::multiply_by(40)},
+                  
+                  {0}
+  )
+}
+
 
 #runs all state calcs
 get_all_states <- function(X, domains){
+
   ret <- map(domains, ~iterate_states(.x, X)) %>% setNames(domains)
 }
 
 # is the iterator for all states
 iterate_states <- function(domain, X, ...){
+
   Y <- X %>% filter_goals(domain)
-  calc_state(
+  a<- calc_state(
     open_h = Y$open_h,
     work_h = Y$work_h,
     n_goal = nrow(Y),
@@ -410,8 +456,7 @@ calc_state <- function(open_h, work_h, n_goal, av_h_gls = NULL, domain = "week",
   work_h_tot <- sum(work_h, na.rm = TRUE)
   open_h_tot <- sum(open_h, na.rm = TRUE)
   av_h_gls = ifelse(is.null(av_h_gls), 5, mean(av_h_gls, na.rm = TRUE))  # param
-  tot_h <- domain_work_h(domain, ...)
-
+  tot_h <- domain_work_h(domain, ...) %>% max(0)
   list(
     workload = (open_h_tot / tot_h),
     progress_tot = (1 - sum(open_h_tot) / sum(work_h_tot)),
@@ -421,6 +466,55 @@ calc_state <- function(open_h, work_h, n_goal, av_h_gls = NULL, domain = "week",
 }
 
 
+# RENDERING AND UPDATING FUNCTIONS ---------
+# updates any element
+update_ui_element <- function(type, id, value, output = NULL, session = NULL, ...){
+  switch(type,
+         
+         # "ProgressBar" = {shinyWidgets::updateProgressBar(session = session, id = id, value = (value))},
+         
+         "render" = {output[[id]] <- renderUI({value})},
+         
+         "PickerInput" = {updatePickerInput(session = session, inputId = id, selected = value)},
+         
+         {NULL}
+         
+  )
+}
+
+# renders all goals progress bar functions
+render_progress_bar <- function(goal, output){
+  # updating the slider
+  goal %>% mutate(
+    id = paste0(goal_id, "_bar"),
+    value = pmap(., .f = mke_progress_bar)) %>% 
+    pwalk(., .f = update_ui_element, output = output, type = "render")
+}
+
+# renders all goals progress bar functions
+render_status_badge <- function(goal, output){
+  # updating the slider
+  goal %>% mutate(
+    id = paste0(goal_id, "_status"),
+    value = pmap(., .f = mke_status_badge)) %>% 
+    pwalk(., .f = update_ui_element, output = output, type = "render")
+}
+
+# Toggles show/ Hide edit mode
+toggle_edit_mode <- function(id, flag, ...){
+  # mode on
+  if (isTRUE(flag)){
+    shinyjs::show(paste0(id, "_body"))
+    shinyjs::show(paste0(id, "_edit_mode"))
+    shinyjs::hide(paste0(id, "_view_mode"))
+  } 
+  # mode off
+  else {
+    shinyjs::hide(paste0(id, "_body"))
+    shinyjs::hide(paste0(id, "_edit_mode"))
+    shinyjs::show(paste0(id, "_view_mode"))
+  }
+}
 ## ------------ DATA TABLE MODULE --------------------
 
 # makes a nice empty DT in case of no data
