@@ -441,7 +441,7 @@ store_data_set <- function(new, old = NULL){
 
   if (!identical(new, old)){
     print("saving")
-    write_csv(new, here("data", "goal.csv"))
+    write_csv(new, here("data", Sys.getenv("save_mode")))
     return(OdsUIHelper::reactive_trigger())
   } else {
     return(NULL)
@@ -533,7 +533,9 @@ update_ui_element <- function(type, id, value, output = NULL, session = NULL, ..
          "render" = {output[[id]] <- renderUI({value})},
          
          
-         "PickerInput" = {updatePickerInput(session = session, inputId = id, selected = value)},
+         "PickerInput" = { updatePickerInput(session = session, inputId = id, selected = value)},
+         
+         "SliderInput" = {updateSliderTextInput(session = session, inputId = id, selected = value)},
          
          {NULL}
          
@@ -564,6 +566,7 @@ render_status_badge <- function(goal, output){
     pwalk(., .f = update_ui_element, output = output, type = "render")
 }
 
+# updates a picker badge from goals 
 update_picker_badge <- function(goal, session){
   goal %>% mutate(
     id = paste0(goal_id, "_status"),
@@ -571,8 +574,17 @@ update_picker_badge <- function(goal, session){
     pwalk(., .f = update_ui_element, session = session, type = "PickerInput")
 }
 
+# updates a progress slider from goals
+update_slider_progress <- function(goal, session){
+  goal %>% mutate(
+    id = paste0(goal_id, "_progress"),
+    value = round(Progress* 100, digits = 0) %>% min(100) %>% max(0)) %>% 
+    pwalk(., .f = update_ui_element, session = session, type = "SliderInput")
+}
+
 # Toggles show/ Hide edit mode
 toggle_edit_mode <- function(id, flag, ...){
+
   # mode on
   if (isTRUE(flag)){
     shinyjs::show(paste0(id, "_body"))

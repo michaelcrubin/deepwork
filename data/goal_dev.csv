@@ -1,0 +1,4 @@
+goal_id,quarter,week,day,Activity,Project,Category,Status,Continous,Progress,work_h,Planned,Concluded,Description,Criteria,Comment,open_h
+gl00081,FALSE,FALSE,FALSE,Personal Brand,DiverseInvest,Job & Purpose,Done,NA,0,5,30.06.23,NA,"Define Personal Branding (slogan, story, resume etc..)",a short Branding Deck,NA,5
+gl00076,FALSE,FALSE,FALSE,Kids,Plan,Family & Relationships,Not started,NA,0,5,30.06.22,NA,Decide what to do with kids,NA,NA,5
+gl00086,TRUE,TRUE,TRUE,Kill the depression wo medics,MentalHealth,Health & Lifestyle,Going Well,In Focus,0.6,5,30.06.23,NA,Reduces medics to zero and kill finally the depression.,No more medics + stable mood,Mostly linked to alcohol consumption,4.1000000000000005

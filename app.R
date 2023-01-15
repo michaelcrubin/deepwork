@@ -29,6 +29,10 @@ library(plotly)
 #remotes::install_github("ODAPES/OdsColor",ref="master",  dependencies = TRUE , force = TRUE)
 
 #renv::snah()
+# here IF I WORK FOR DEV USE "goal_dev.csv" FOR PRPDUCTION USE "goal_original.csv"
+save_mode <- "goal_dev.csv"
+Sys.setenv("save_mode" = save_mode)
+Sys.getenv("save_mode")
 
 library(OdsDataHelper)
 library(OdsDBHelper)
@@ -37,22 +41,14 @@ library(OdsColor)
 
 
 # source the modules
+source(here("MODULES","module_daily.R"), local = F)
 source(here("MODULES","module_weekly.R"), local = F)
 source(here("MODULES","module_quarterly.R"), local = F)
 source(here("MODULES","module_long_term.R"), local = F)
 source(here("HELPER","helpers.R"), local = F)
 # 
 
-user <- list(config = "config/system_params.yml")
 
-# sys_params<-get_system_parameters(user)
-# text <- import_language()
-# 
-
-# params<-list(sys_params = sys_params,
-#              text = text,
-#              ui_elems = ui_elems
-#              )
 # 
 get_params <- function(){
   list(
@@ -82,9 +78,8 @@ get_r_control<-function(){
   return(r_control)
 }
 get_r_data <- function(params){
-  goal = read_csv(here("data", "goal.csv")) %>% mutate(open_h = (1 - Progress) * work_h) %>% slice(1:3)
+  goal = read_csv(here("data", Sys.getenv("save_mode"))) %>% mutate(open_h = (1 - Progress) * work_h)
   state <- get_all_states(goal, params$system_params$domains)
-
   r_data <- reactiveValues(
     goal = goal,
     state = state
@@ -159,8 +154,8 @@ shinyApp(
       sidebarMenu(id = "tab_menu",
         sidebarHeader(h4("Goals")),
         menuItem(
-          "Day",
-          tabName = "day_id",
+          "Daily",
+          tabName = "daily_id",
           icon = icon("calendar-day")
         ),
         menuItem(
@@ -231,15 +226,9 @@ shinyApp(
       tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "CSS/prov_css.css")),
       useShinyjs(),
       
-      
-      
       tabItems(
         
-        tabItem(
-          tabName =  "day_id",
-          
-          
-        ),
+        tabItem(tabName =  "daily_id", Daily_UI("daily_id", params)),
         
         tabItem(tabName = "weekly_id", Weekly_UI("weekly_id", params)),
         
@@ -256,40 +245,24 @@ shinyApp(
     r_control <- get_r_control()
     r_data <- get_r_data(params)
     
-    # observeEvent(r_control$update_reactive, {
-    #   req(r_control$update_reactive)
-    #   
-    
+    # observes and stores the active (open) tab
     observe({
       req(input$tab_menu)
       r_control$actual_tab <-  input$tab_menu
     })
   
-      
-  
-    observe({
-
+    # update the goals values + recalc state // later from DB
+    observeEvent(r_control$update_reactive, {
+      req(r_control$update_reactive)
       print("reimporting")
-      #req(F)
-      req(r_control$render_weekly)
-      req(r_control$render_quarterly)
       # Later more fine graned
-      r_data$goal <- read_csv(here("data", "goal.csv")) %>% mutate(open_h = (1 - Progress) * work_h)
+      r_data$goal <- read_csv(here("data", Sys.getenv("save_mode"))) %>% mutate(open_h = (1 - Progress) * work_h)
       r_data$state <- get_all_states(r_data$goal, params$system_params$domains)
-      r_control$render_quarterly <- FALSE
-      r_control$render_weekly <- FALSE
-      r_control$render_status_badge <- NULL
-      # browser()
-      # req(r_control$to_rerender)
-      # paste0("rerender_",r_control$to_rerender) %>%
-      #   walk(~r_control[[.x]] <- OdsUIHelper::reactive_trigger())
-#       r_control$rerender_weekly
-#       rerender_daily =        <- OdsUIHelper::reactive_trigger()
-# ,
-#       rerender_weekly = NULL,
-#       rerender_quarterly = NULL
       
     })
+    
+    # Daily server logic
+    Daily_SERVER("daily_id", r_data, r_control, params)
     
     # Weekly server logic
     Weekly_SERVER("weekly_id", r_data, r_control, params)

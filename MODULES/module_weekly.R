@@ -19,23 +19,24 @@ Weekly_UI <- function(id, params) {
     )
   )
 }
-#https://community.rstudio.com/t/shiny-sortable-how-to-limit-number-of-items-that-can-be-dropped/69233/2
 
 
 ### SERVER MODULE -----------------
 Weekly_SERVER <- function(id, r_data, r_control, params) {
   moduleServer(id,function(input, output, session) {
     
-    observeEvent(input$update, {
-      r_control$rerender_weekly <- OdsUIHelper::reactive_trigger()
-    })
     
     ##-------------- APERO----------------
     ns <- session$ns
 
+    # currently not used
+    observeEvent(input$update, {
+      req(F)
+      r_control$rerender_weekly <- OdsUIHelper::reactive_trigger()
+    })
     
     ## -----BUCKET RENDERER ----------
-    
+    # main bucket rendering
     observe({
       print("rendering weekly")
       r_control$rerender_weekly
@@ -62,24 +63,16 @@ Weekly_SERVER <- function(id, r_data, r_control, params) {
       render_status_badge(isolate(r_data$goal), output)
     })
 
-    observeEvent(r_control$render_status_badge, {
-
-      req(r_control$render_status_badge)
-    print("observe week")
-      render_status_badge(r_control$render_status_badge, output)
-      update_picker_badge(r_control$render_status_badge, session)
-      
-      r_control$render_weekly <- TRUE
-    })
     
     ## -----PROGRESS UPDATE ----------
     # listen to update inputs (slider)
     progress_listener_d <- reactive({
-      r_data$goal %>% listen_to(input, "quarter", "_progress", "df") %>% 
+      req(r_control$actual_tab == "weekly_id")
+      isolate(r_data$goal) %>% listen_to(input, "quarter", "_progress", "df") %>% 
         mutate(old_Progress = Progress) %>%
         mutate(Progress = as.numeric(value) / 100) %>% 
         mutate(change = Progress != old_Progress) %>% dplyr::filter(change)
-      }) %>% debounce(500)
+      }) #%>% debounce(5000)
   
     # observe progress slider and update + save Dataset + update bar
     observe({
@@ -87,26 +80,26 @@ Weekly_SERVER <- function(id, r_data, r_control, params) {
       req(nrow(input_df) > 0)
       
       # storing the data
-      r_control$update_reactive <- r_data$goal %>% save_df_join(update = input_df) %>%
-        store_data_set(old = r_data$goal)
+      r_control$update_reactive <- isolate(r_data$goal) %>% save_df_join(update = input_df) %>%
+        store_data_set(old = isolate(r_data$goal))
       
       # updating the progress bars
-      render_progress_bar(input_df, output)
-      
-      # which other buckets to update
-      # r_control$rerender_quarterly <- OdsUIHelper::reactive_trigger()
-      # r_control$rerender_daily <- OdsUIHelper::reactive_trigger()
+      r_control$render_progress_bar <- input_df
     })
-
+    
+    # rerendering the progress bar in this namespace
+    observeEvent(r_control$render_progress_bar, {
+      req(r_control$render_progress_bar)
+      render_progress_bar(r_control$render_progress_bar, output)
+      update_slider_progress(r_control$render_progress_bar, session)
+    })
+    
     
     ## -----STATUS UPDATE ----------
     # listen to update inputs (slider)
     status_listener <- reactive({
-
-  
-      req((r_control$actual_tab) == "weekly_id")
-
-      s<-isolate(r_data$goal) %>% listen_to(input, "quarter", "_status", "df") %>% 
+      req(r_control$actual_tab == "weekly_id")
+      isolate(r_data$goal) %>% listen_to(input, "quarter", "_status", "df") %>% 
         mutate(old_Status = Status) %>%
         mutate(Status = value) %>% 
         mutate(change = Status != old_Status) %>% dplyr::filter(change)
@@ -117,19 +110,18 @@ Weekly_SERVER <- function(id, r_data, r_control, params) {
       input_df <- status_listener()
       req(nrow(input_df) > 0)
       print("Status week")
-      r_control$update_reactive <- r_data$goal %>% save_df_join(update = input_df) %>%
-        store_data_set(old = r_data$goal)
-
+      r_control$update_reactive <- isolate(r_data$goal) %>% save_df_join(update = input_df) %>%
+        store_data_set(old = isolate(r_data$goal))
       r_control$render_status_badge <- input_df
-      # updating the progress bars
-      
-      
-      # which other buckets to update
-      # r_control$rerender_quarterly <- OdsUIHelper::reactive_trigger()
-      # r_control$rerender_daily <- OdsUIHelper::reactive_trigger()
     })
     
-
+    # rerendering the badge in this namespace
+    observeEvent(r_control$render_status_badge, {
+      req(r_control$render_status_badge)
+      render_status_badge(r_control$render_status_badge, output)
+      update_picker_badge(r_control$render_status_badge, session)
+    })
+    
     
     ## -----SORTING UPDATE ----------
     # when user rearranges buckets, reacts and stores in DB
@@ -148,7 +140,8 @@ Weekly_SERVER <- function(id, r_data, r_control, params) {
     ## -----SHOW AND HIDE DETAILS ----------
     # listen to toggle inputs
     toggle_listener <- reactive({
-      a<- isolate(r_data$goal) %>% listen_to(input, "quarter", "_toggle") %>% purrr::modify(as.logical)
+      req(r_control$actual_tab == "weekly_id")
+      isolate(r_data$goal) %>% listen_to(input, "quarter", "_toggle") %>% purrr::modify(as.logical)
       })
 
     
