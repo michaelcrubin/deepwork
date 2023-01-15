@@ -71,25 +71,25 @@ mke_picker_badges <- function(ns, goal_id, Status){
 }
 
 # workload recommendation badge
-workload_recommend_badge <- function(workload, available_gls){
-  
+workload_recommend_badge <- function(workload, available_gls, n_goal){
+
   if (!check_value(workload)){
     return(NULL)
   }
   else if (workload > 1){
-    paste("Eliminate", ceiling(-available_gls), "Goals") %>%
+    paste(n_goal,"Goals. ","Eliminate", ceiling(-available_gls), ".") %>%
       dashboardBadge(color = "danger")
   }
   else if (workload > 0.75){
-    paste("Focus on Important first") %>%
+    paste(n_goal,"Goals.", "Focus on Important first") %>%
       dashboardBadge(color = "warning")
   }
   else if (workload < 0.33){
-    paste("You can add", floor(available_gls), "Goals") %>%
+    paste(n_goal,"Goals.","You can add", floor(available_gls), "Goals") %>%
       dashboardBadge(color = "primary")
   }
   else {
-    paste("Great Workload Balance") %>%
+    paste(n_goal,"Goals.","Great Workload Balance") %>%
       dashboardBadge(color = "success")
   }
 }
@@ -197,7 +197,7 @@ mke_workload_pie <- function(workload){
 mke_bucket_ttl <- function(ttl, suffix, ns){
   
   tagList(
-    fluidRow(style = "margin-left:0px; margin-right:0px; height:110px;",
+    fluidRow(style = "margin-left:0px; margin-right:0px;",
       column(width = 6,
              fluidRow(h4(ttl)),
              fluidRow(shiny::uiOutput(ns(paste0(suffix, "_ttl"))))
@@ -213,24 +213,36 @@ mke_bucket_ttl <- function(ttl, suffix, ns){
 }
 
 # makes the header title, subtitle + detail toggle for box
-mke_header <- function(ns, goal_id, Activity, Project){
-  tagList(
-    fluidRow(
-      column(width = 10, 
-             fluidRow(h4(Activity)),
-             fluidRow(h6(Project))
+mke_header <- function(ns, goal_id, Activity, Project, edit){
+  if (edit){
+    tagList(
+      fluidRow(
+        column(width = 10, 
+               fluidRow(h4(Activity)),
+               fluidRow(h6(Project))
+        ),
+        column(width = 2, style = "padding-left: 0px; padding-right: 0px;",
+               switchInput(
+                 inputId = ns(paste0(goal_id, "_toggle")),
+                 onLabel = icon("edit"),
+                 offLabel = icon("edit"),
+                 size = "mini"
+               )
+        )
       ),
-      column(width = 2, style = "padding-left: 0px; padding-right: 0px;",
-             switchInput(
-               inputId = ns(paste0(goal_id, "_toggle")),
-               onLabel = icon("edit"),
-               offLabel = icon("edit"),
-               size = "mini"
-             )
-      )
-    ),
-    tags$hr(style = "margin-top: 0px;margin-bottom: 10px;")
-  )
+      tags$hr(style = "margin-top: 0px;margin-bottom: 10px;")
+    )
+  } else {
+    tagList(
+      fluidRow(
+        column(width = 12, 
+               fluidRow(h4(Activity)),
+               fluidRow(h6(Project))
+        )
+      ),
+      tags$hr(style = "margin-top: 0px;margin-bottom: 10px;")
+    )
+  }
 }
 
 # makes the Body (details) for box
@@ -250,30 +262,39 @@ mke_body <- function(ns, goal_id, Description, Criteria){
 }
 
 # makes the footer with UI elements (edit or fix mode) for box
-mke_footer <- function(ns, goal_id, Progress, Status, edit_mode = FALSE){
-  tagList(
-    fluidRow(id = ns(paste0(goal_id, "_edit_mode")), column(width = 8, mke_slider_progress(ns, goal_id, Progress)), column(width = 4, mke_picker_badges(ns, goal_id, Status))),
-    fluidRow(id = ns(paste0(goal_id, "_view_mode")),
-      column(width = 8, shiny::uiOutput(ns(paste0(goal_id, "_bar")))),
-      column(width = 4, shiny::uiOutput(ns(paste0(goal_id, "_status"))))
+mke_footer <- function(ns, goal_id, Progress, Status, edit){
+  if (edit){
+    tagList(
+      shinyjs::hidden(fluidRow(id = ns(paste0(goal_id, "_edit_mode")), column(width = 8, mke_slider_progress(ns, goal_id, Progress)), column(width = 4, mke_picker_badges(ns, goal_id, Status)))),
+      fluidRow(id = ns(paste0(goal_id, "_view_mode")),
+               column(width = 8, shiny::uiOutput(ns(paste0(goal_id, "_bar")))),
+               column(width = 4, shiny::uiOutput(ns(paste0(goal_id, "_fixstatus"))))
       )
-  )
+    )
+  } else {
+    tagList(
+      fluidRow(id = ns(paste0(goal_id, "_view_mode")),
+               column(width = 8, shiny::uiOutput(ns(paste0(goal_id, "_bar")))),
+               column(width = 4, shiny::uiOutput(ns(paste0(goal_id, "_fixstatus"))))
+      )
+    )
+  }
 }
 
 # makes box content of a Box
-mke_content <- function(ns, goal_id, Activity, Project, Status, Progress, Description, Criteria, edit_mode){
+mke_content <- function(ns, goal_id, Activity, Project, Status, Progress, Description, Criteria, edit){
 
   column(width = 12,
-         mke_header(ns, goal_id, Activity, Project),
+         mke_header(ns, goal_id, Activity, Project, edit),
          shinyjs::hidden(mke_body(ns, goal_id, Description, Criteria)),
-         mke_footer(ns, goal_id, Progress, Status, edit_mode)
+         mke_footer(ns, goal_id, Progress, Status, edit)
   )
 }
 
 # makes the Value Box for 1 goal
-make_box <- function(goal_id, Activity, Project, Category, Status, Progress, Description, Criteria, edit_mode, params, ns, ... ){
+make_box <- function(goal_id, Activity, Project, Category, Status, Progress, Description, Criteria, params, ns, edit, ... ){
   bs4InfoBox(
-    title = mke_content(ns, goal_id, Activity, Project, Status, Progress, Description, Criteria,  edit_mode),
+    title = mke_content(ns, goal_id, Activity, Project, Status, Progress, Description, Criteria, edit),
     icon = params$ui_data$category_style %>% dplyr::filter(Category == !!Category) %>% pull(icon) %>% shiny::icon(),
     color = params$ui_data$category_style %>% dplyr::filter(Category == !!Category) %>% pull(bs_color),
     width = 12,
@@ -292,7 +313,38 @@ mke_goal_box <- function(X, ...){
     setNames(X$goal_id)
 }
 
+
+
+
+# Create the entire Sortable Bucket
+mke_goal_bucket <- function(goal, id, ttl_left, ttl_right, filter_left, filter_right, params, ns){
+  bucket_list(
+    header = NULL,
+    group_name = ns(id),
+    orientation = "horizontal",
+    add_rank_list(
+      text = mke_bucket_ttl(ttl_left, "left", ns),
+      input_id = which_column(filter_left),
+      options = sortable_options(height = "400px"),
+      labels = filter_goals(goal, filter_left) %>% mke_goal_box(params, ns, edit = TRUE)
+    ),
+    add_rank_list(
+      text = mke_bucket_ttl(ttl_right, "right", ns),
+      input_id = which_column(filter_right),
+      options = sortable_options(height = "400px"),
+      labels = filter_goals(goal, filter_right) %>% mke_goal_box(params, ns, edit = FALSE)
+    )
+  )
+}
+
+
+
 ## DATA ------------ HANDLING HELPER --------------------
+
+# gives column from filter 
+which_column <- function(id){
+  sub("_.*", "", id)
+}
 
 # filters the goal dataset accoridng to the criteria
 filter_goals <- function(X, filter = NULL){
@@ -378,12 +430,15 @@ update_sorting <- function(X, input_vec){
   input_vec$week <- c(input_vec$week, input_vec$day)
   input_vec$quarter <- c(input_vec$quarter, input_vec$week)
   sorter <- input_vec %>% map_dbl(length) %>% which.max %>% magrittr::extract2(input_vec, .)
-  Y <- X %>% mutate(across(.cols = names(input_vec), ~goal_id %in% input_vec[[cur_column()]]))
+  
+  clean_input <- (input_vec) %>% keep_by_name(c(colnames(X)))
+  Y <- X %>% mutate(across(.cols = names(clean_input), ~goal_id %in% clean_input[[cur_column()]]))
   Z <- Y %>% arrange(match(goal_id, sorter))
 }
 
 # stores dataset in DB or csv
 store_data_set <- function(new, old = NULL){
+
   if (!identical(new, old)){
     print("saving")
     write_csv(new, here("data", "goal.csv"))
@@ -461,6 +516,7 @@ calc_state <- function(open_h, work_h, n_goal, av_h_gls = NULL, domain = "week",
     workload = (open_h_tot / tot_h),
     progress_tot = (1 - sum(open_h_tot) / sum(work_h_tot)),
     open_h = open_h_tot,
+    n_goal = n_goal,
     available_gls = (tot_h - open_h_tot) / av_h_gls
   )
 }
@@ -469,17 +525,25 @@ calc_state <- function(open_h, work_h, n_goal, av_h_gls = NULL, domain = "week",
 # RENDERING AND UPDATING FUNCTIONS ---------
 # updates any element
 update_ui_element <- function(type, id, value, output = NULL, session = NULL, ...){
+
   switch(type,
          
          # "ProgressBar" = {shinyWidgets::updateProgressBar(session = session, id = id, value = (value))},
          
          "render" = {output[[id]] <- renderUI({value})},
          
+         
          "PickerInput" = {updatePickerInput(session = session, inputId = id, selected = value)},
          
          {NULL}
          
   )
+}
+
+render_bucket_list <- function(goal, id, ttl_left, ttl_right, filter_left, filter_right, params, ns, output){
+
+  mke_goal_bucket(goal, id, ttl_left, ttl_right, filter_left, filter_right, params, ns) %>% 
+    update_ui_element(type = "render", id = id, value = ., output = output)
 }
 
 # renders all goals progress bar functions
@@ -495,9 +559,16 @@ render_progress_bar <- function(goal, output){
 render_status_badge <- function(goal, output){
   # updating the slider
   goal %>% mutate(
-    id = paste0(goal_id, "_status"),
+    id = paste0(goal_id, "_fixstatus"),
     value = pmap(., .f = mke_status_badge)) %>% 
     pwalk(., .f = update_ui_element, output = output, type = "render")
+}
+
+update_picker_badge <- function(goal, session){
+  goal %>% mutate(
+    id = paste0(goal_id, "_status"),
+    value = Status) %>% 
+    pwalk(., .f = update_ui_element, session = session, type = "PickerInput")
 }
 
 # Toggles show/ Hide edit mode

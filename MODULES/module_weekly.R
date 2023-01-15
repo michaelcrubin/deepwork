@@ -9,70 +9,68 @@ Weekly_UI <- function(id, params) {
       column(10, offset = 0,
              shiny::fluidRow(shiny::h2("Weekly Focus")),
              shiny::fluidRow(shiny::h5("Select Objectives of actual Week"))
-      )
-      # column(width = 2,
-      #        shiny::fluidRow(shiny::h6("Edit Mode")),
-      #        shiny::fluidRow(switchInput(inputId = ns("edit_mode"), value = TRUE))
-      # )
+      ),
+      column(2, actionButton(ns("update"), "Update"))
     ),
     fluidRow(
       column(width = 12,
-             shiny::uiOutput(ns("goal_list"))
+             shiny::uiOutput(ns("week_bucket"))
       )
     )
   )
 }
+#https://community.rstudio.com/t/shiny-sortable-how-to-limit-number-of-items-that-can-be-dropped/69233/2
 
 
 ### SERVER MODULE -----------------
 Weekly_SERVER <- function(id, r_data, r_control, params) {
   moduleServer(id,function(input, output, session) {
     
+    observeEvent(input$update, {
+      r_control$rerender_weekly <- OdsUIHelper::reactive_trigger()
+    })
+    
     ##-------------- APERO----------------
     ns <- session$ns
 
     
     ## -----BUCKET RENDERER ----------
-    output$goal_list <- renderUI({
-      	#https://community.rstudio.com/t/shiny-sortable-how-to-limit-number-of-items-that-can-be-dropped/69233/2
-      print("rendering")
-      goal <- isolate(r_data$goal)
-      a <- filter_goals(goal, "week") %>% mke_goal_box(input$edit_mode, params, ns)
-      b <- filter_goals(goal, "quarter_only") %>% mke_goal_box(input$edit_mode, params, ns)
-
-      x <-bucket_list(
-        header = NULL,
-        
-        group_name = ns("week_bucket"),
-        orientation = "horizontal",
-        add_rank_list(
-          text = mke_bucket_ttl("Focus of Week", "left", ns),
-          input_id = "week",
-          options = sortable_options(height = "400px"),
-          labels = a
-        ),
-        add_rank_list(
-          text = mke_bucket_ttl("Quarterly", "right", ns),
-          input_id = "quarter",
-          options = sortable_options(height = "400px"),
-          labels = b
-        )
-      )
-      return(x)
+    
+    observe({
+      print("rendering weekly")
+      r_control$rerender_weekly
+      render_bucket_list(goal = isolate(r_data$goal),
+                         id = "week_bucket",
+                         ttl_left = "Focus of Week",
+                         ttl_right = "Quarterly Goals",
+                         filter_left = "week",
+                         filter_right = "quarter_only",
+                         params = params, ns = ns, output = output)
     })
     
     # initial progressbar rendering
     observe({
-      print("renders all bars")
+      print("renders all bars weekly")
+      r_control$rerender_weekly
       render_progress_bar(isolate(r_data$goal), output)
     })
     
     # initial statusbadge rendering
     observe({
-      print("renders all badges")
+      print("renders all badges weekly")
+      r_control$rerender_weekly
       render_status_badge(isolate(r_data$goal), output)
     })
 
+    observeEvent(r_control$render_status_badge, {
+
+      req(r_control$render_status_badge)
+      
+      render_status_badge(r_control$render_status_badge, output)
+      update_picker_badge(r_control$render_status_badge, session)
+      
+      r_control$render_weekly <- TRUE
+    })
     
     ## -----PROGRESS UPDATE ----------
     # listen to update inputs (slider)
@@ -94,13 +92,18 @@ Weekly_SERVER <- function(id, r_data, r_control, params) {
       
       # updating the progress bars
       render_progress_bar(input_df, output)
+      
+      # which other buckets to update
+      # r_control$rerender_quarterly <- OdsUIHelper::reactive_trigger()
+      # r_control$rerender_daily <- OdsUIHelper::reactive_trigger()
     })
 
     
     ## -----STATUS UPDATE ----------
     # listen to update inputs (slider)
     status_listener <- reactive({
-      r_data$goal %>% listen_to(input, "quarter", "_status", "df") %>% 
+
+      s<-isolate(r_data$goal) %>% listen_to(input, "quarter", "_status", "df") %>% 
         mutate(old_Status = Status) %>%
         mutate(Status = value) %>% 
         mutate(change = Status != old_Status) %>% dplyr::filter(change)
@@ -110,29 +113,39 @@ Weekly_SERVER <- function(id, r_data, r_control, params) {
     observe({
       input_df <- status_listener()
       req(nrow(input_df) > 0)
-      # storing the data
+      print("Status week")
       r_control$update_reactive <- r_data$goal %>% save_df_join(update = input_df) %>%
         store_data_set(old = r_data$goal)
-      
+
+      r_control$render_status_badge <- input_df
       # updating the progress bars
-      render_status_badge(input_df, output)
+      
+      
+      # which other buckets to update
+      # r_control$rerender_quarterly <- OdsUIHelper::reactive_trigger()
+      # r_control$rerender_daily <- OdsUIHelper::reactive_trigger()
     })
     
+
     
     ## -----SORTING UPDATE ----------
     # when user rearranges buckets, reacts and stores in DB
     observeEvent(input$week_bucket, {
       input_vec <- input$week_bucket
       req(length(input_vec) > 0)
+      print("Sorting Week")
       r_control$update_reactive <- r_data$goal %>% update_sorting(input_vec) %>% 
         store_data_set(r_data$goal)
+      
+      # which other buckets to update
+      r_control$rerender_daily <- OdsUIHelper::reactive_trigger()
     })
     
     
     ## -----SHOW AND HIDE DETAILS ----------
     # listen to toggle inputs
     toggle_listener <- reactive({
-      a<- r_data$goal %>% listen_to(input, "quarter", "_toggle") %>% purrr::modify(as.logical)
+      a<- isolate(r_data$goal) %>% listen_to(input, "quarter", "_toggle") %>% purrr::modify(as.logical)
       })
 
     
@@ -149,7 +162,8 @@ Weekly_SERVER <- function(id, r_data, r_control, params) {
     # left title and plots
     output$left_ttl <- renderUI({
       workload_recommend_badge(r_data$state$week$workload, 
-                               r_data$state$week$available_gls)
+                               r_data$state$week$available_gls,
+                               r_data$state$week$n_goal)
       })
     
     output$left_plot_1 <- renderPlotly({
@@ -164,7 +178,8 @@ Weekly_SERVER <- function(id, r_data, r_control, params) {
     # right title and plots
     output$right_ttl <- renderUI({
       workload_recommend_badge(r_data$state$quarter$workload, 
-                               r_data$state$quarter$available_gls)
+                               r_data$state$quarter$available_gls,
+                               r_data$state$quarter$n_goal)
       })
     
     output$right_plot_1 <- renderPlotly({

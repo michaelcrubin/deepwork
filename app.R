@@ -70,13 +70,19 @@ get_r_control<-function(){
 
   r_control <- reactiveValues(
     goto_tab = NULL,
-    update_reactive = NULL
+    update_reactive = NULL,
+    rerender_daily = NULL,
+    rerender_weekly = NULL,
+    rerender_quarterly = NULL,
+    to_rerender = NULL
+    
+    
 
   )
   return(r_control)
 }
 get_r_data <- function(params){
-  goal = read_csv(here("data", "goal.csv")) %>% mutate(open_h = (1 - Progress) * work_h)
+  goal = read_csv(here("data", "goal.csv")) %>% mutate(open_h = (1 - Progress) * work_h) %>% slice(1:3)
   state <- get_all_states(goal, params$system_params$domains)
 
   r_data <- reactiveValues(
@@ -237,7 +243,7 @@ shinyApp(
         
         tabItem(tabName = "weekly_id", Weekly_UI("weekly_id", params)),
         
-       #tabItem(tabName = "quarterly_id", Quarterly_UI("quarterly_id", params)),
+        tabItem(tabName = "quarterly_id", Quarterly_UI("quarterly_id", params)),
 
         tabItem(tabName = "long_term_id", LongTerm_UI("long_term_id", params))
       )
@@ -250,19 +256,42 @@ shinyApp(
     r_control <- get_r_control()
     r_data <- get_r_data(params)
     
-    observeEvent(r_control$update_reactive, {
-      req(r_control$update_reactive)
+    # observeEvent(r_control$update_reactive, {
+    #   req(r_control$update_reactive)
+    #   
+  
+      
+  
+    observe({
+
       print("reimporting")
+      #req(F)
+      req(r_control$render_weekly)
+      req(r_control$render_quarterly)
+      
       # Later more fine graned
       r_data$goal <- read_csv(here("data", "goal.csv")) %>% mutate(open_h = (1 - Progress) * work_h)
       r_data$state <- get_all_states(r_data$goal, params$system_params$domains)
+      r_control$render_quarterly <- FALSE
+      r_control$render_weekly <- FALSE
+      r_control$render_status_badge <- NULL
+      # browser()
+      # req(r_control$to_rerender)
+      # paste0("rerender_",r_control$to_rerender) %>%
+      #   walk(~r_control[[.x]] <- OdsUIHelper::reactive_trigger())
+#       r_control$rerender_weekly
+#       rerender_daily =        <- OdsUIHelper::reactive_trigger()
+# ,
+#       rerender_weekly = NULL,
+#       rerender_quarterly = NULL
+      
     })
     
     # Weekly server logic
     Weekly_SERVER("weekly_id", r_data, r_control, params)
     
     # Weekly server logic
-    #Quarterly_SERVER("quarterly_id", r_data, r_control, params)
+    Quarterly_SERVER("quarterly_id", r_data, r_control, params)
     
     # long term server logic
     LongTerm_SERVER("long_term_id", r_data, r_control, params)

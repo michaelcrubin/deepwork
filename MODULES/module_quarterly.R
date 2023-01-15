@@ -7,17 +7,14 @@ Quarterly_UI <- function(id, params) {
   tagList(
     fluidRow(
       column(10, offset = 0,
-             shiny::fluidRow(shiny::h2("Quarterly Plan")),
-             shiny::fluidRow(shiny::h5("Select Objectives to complete this Quarter"))
+             shiny::fluidRow(shiny::h2("Quarterly Objectives")),
+             shiny::fluidRow(shiny::h5("Select Objectives to Accomplish this Quarter"))
       ),
-      column(width = 2,
-             shiny::fluidRow(shiny::h6("Edit Mode")),
-             shiny::fluidRow(switchInput(inputId = ns("edit_mode"), value = TRUE))
-      )
+      column(2, actionButton(ns("update"), "Update"))
     ),
     fluidRow(
       column(width = 12,
-             shiny::uiOutput(ns("goal_list"))
+             shiny::uiOutput(ns("quarter_bucket"))
       )
     )
   )
@@ -28,76 +25,179 @@ Quarterly_UI <- function(id, params) {
 Quarterly_SERVER <- function(id, r_data, r_control, params) {
   moduleServer(id,function(input, output, session) {
     
+    observeEvent(input$update, {
+      r_control$rerender_quarterly <- OdsUIHelper::reactive_trigger()
+    })
+    
     ##-------------- APERO----------------
     ns <- session$ns
 
+    
     ## -----BUCKET RENDERER ----------
-    output$goal_list <- renderUI({
-      print("rendering")
-      bucket_list(
-        header = NULL,
-        
-        group_name = ns("quarterly_bucket"),
-        orientation = "horizontal",
-        add_rank_list(
-          text = h4("Focus this Quarter"),
-          input_id = "is_quarterly",
-          labels = filter_goals(r_data$goal, "quarterly") %>% mke_goal_box(input$edit_mode, params, ns)
-        ),
-        add_rank_list(
-          text = h4("All Incomplete Goals"),
-          input_id = "is_all",
-          options = sortable_options(height = "400px"),
-          labels = filter_goals(r_data$goal, "all_complete") %>% mke_goal_box(input$edit_mode, params, ns)
-        )
-      )
+    
+    observe({
+      print("rendering quarter")
+      r_control$rerender_quarterly
+      render_bucket_list(goal = isolate(r_data$goal),
+                         id = "quarter_bucket",
+                         ttl_left = "Quarterly Goals",
+                         ttl_right = "Long-Term Goals",
+                         filter_left = "quarter",
+                         filter_right = "all_incomplete",
+                         params = params, ns = ns, output = output)
     })
     
+    # initial progressbar rendering
+    observe({
+      print("renders all bars quarter")
+      r_control$rerender_quarterly
+      render_progress_bar(isolate(r_data$goal), output)
+    })
+    
+    #initial statusbadge rendering
+    observe({
+      print("renders all badges quarter")
+      r_control$rerender_quarterly
+      render_status_badge(isolate(r_data$goal), output)
+    })
+    
+   
     ## -----PROGRESS UPDATE ----------
     # listen to update inputs (slider)
-    progress_listener_d <- reactive({r_data$goal %>% listen_to(input, "all_complete", "_progress")}) %>% debounce(500)
-    
-    # observe and Call Update for Progress
+    progress_listener_d <- reactive({
+      r_data$goal %>% listen_to(input, "all", "_progress", "df") %>% 
+        mutate(old_Progress = Progress) %>%
+        mutate(Progress = as.numeric(value) / 100) %>% 
+        mutate(change = Progress != old_Progress) %>% dplyr::filter(change)
+      }) %>% debounce(500)
+  
+    # observe progress slider and update + save Dataset + update bar
     observe({
-      input_vec <- progress_listener_d() %>% purrr::discard(is.null)
-      req(length(input_vec) > 0)
-      r_control$update_reactive <- r_data$goal %>% update_data_set(input_vec, "Progress") %>% 
-        store_data_set(r_data$goal)
+      input_df <- progress_listener_d()
+      req(nrow(input_df) > 0)
+      
+      # storing the data
+      r_control$update_reactive <- r_data$goal %>% save_df_join(update = input_df) %>%
+        store_data_set(old = r_data$goal)
+      
+      # updating the progress bars
+      render_progress_bar(input_df, output)
+      
+      # which other buckets to update
+      # r_control$rerender_weekly <- OdsUIHelper::reactive_trigger()
+      # r_control$rerender_daily <- OdsUIHelper::reactive_trigger()
     })
+
     
     ## -----STATUS UPDATE ----------
     # listen to update inputs (slider)
-    status_listener <- reactive({r_data$goal %>% listen_to(input, "all_complete", "_status")})
+    status_listener <- reactive({
+
+      a<-isolate(r_data$goal) %>% listen_to(input, "all", "_status", "df") %>% 
+        mutate(old_Status = Status) %>%
+        mutate(Status = value) %>% 
+        mutate(change = Status != old_Status) %>% dplyr::filter(change)
+    })
     
-    # observe and Call Update for Progress
+    # observe progress slider and update + save Dataset + update bar
     observe({
-      input_vec <- status_listener() %>% purrr::discard(is.null)
-      req(length(input_vec) > 0)
-      r_control$update_reactive <- r_data$goal %>% update_data_set(input_vec, "Status") %>% 
-        store_data_set(r_data$goal)
+
+      input_df <- status_listener()
+      req(nrow(input_df) > 0)
+      # storing the data
+      print("Status week")
+      r_control$update_reactive <- r_data$goal %>% save_df_join(update = input_df) %>%
+        store_data_set(old = r_data$goal)
+      
+      # updating the progress bars
+      r_control$render_status_badge <- input_df
+      
+      # which other buckets to update
+      # r_control$rerender_weekly <- OdsUIHelper::reactive_trigger()
+      # r_control$rerender_daily <- OdsUIHelper::reactive_trigger()
+    })
+    
+    # observe({
+    # 
+    #   req(r_control$render_status_badge)
+    #   render_status_badge(r_control$render_status_badge, output)
+    #   r_control$render_quarterly <- TRUE
+    # })
+    # 
+    observeEvent(r_control$render_status_badge, {
+      browser()
+      req(r_control$render_status_badge)
+      render_status_badge(r_control$render_status_badge, output)
+      update_picker_badge(r_control$render_status_badge, session)
+      
+      r_control$render_quarterly <- TRUE
     })
     
     ## -----SORTING UPDATE ----------
-
-    observeEvent(input$quarterly_bucket, {
-      input_vec <- input$quarterly_bucket
+    # when user rearranges buckets, reacts and stores in DB
+    observeEvent(input$quarter_bucket, {
+      input_vec <- input$quarter_bucket
       req(length(input_vec) > 0)
+      print("Sorting Quarter")
+
       r_control$update_reactive <- r_data$goal %>% update_sorting(input_vec) %>% 
         store_data_set(r_data$goal)
+      
+      # which other buckets to update
+      r_control$rerender_weekly <- OdsUIHelper::reactive_trigger()
+      r_control$rerender_daily <- OdsUIHelper::reactive_trigger()
     })
     
-    ## -----SHOW AND HIDE DETAILS ----------
     
+    ## -----SHOW AND HIDE DETAILS ----------
     # listen to toggle inputs
-    toggle_listener <- reactive({r_data$goal %>% listen_to(input, "all_complete", "_toggle")})
+    toggle_listener <- reactive({
+
+      a<- isolate(r_data$goal) %>% listen_to(input, "all", "_toggle") %>% purrr::modify(as.logical)
+      })
+
     
     # observe to toggle the Detail section
     observe({
-      input_vec <- toggle_listener() %>% purrr::discard(is.null)
+      input_vec <- toggle_listener()
+
       req(length(input_vec) > 0)
-      input_vec %>% purrr::keep(isFALSE) %>% names() %>% paste0("_body")%>% walk(~shinyjs::hide(.x))
-      input_vec %>% purrr::keep(isTRUE) %>% names() %>% paste0("_body")%>% walk(~shinyjs::show(.x))
+      print("toggle all edits")
+      input_vec %>% iwalk(~toggle_edit_mode(id = .y, flag = .x))
     })
+    
+    ## -----RENDERING TITLE TEXT + PLOTS ----------
+  
+    # left title and plots
+    output$left_ttl <- renderUI({
+      workload_recommend_badge(r_data$state$quarter$workload, 
+                               r_data$state$quarter$available_gls,
+                               r_data$state$quarter$n_goal)
+      })
+    
+    output$left_plot_1 <- renderPlotly({
+      mke_workload_pie(r_data$state$quarter$workload)
+      })
+    
+    output$left_plot_2 <- renderPlotly({
+      mke_percent_pie(r_data$state$quarter$progress_tot)
+      })        
+      
+    
+    # right title and plots
+    output$right_ttl <- renderUI({
+      workload_recommend_badge(r_data$state$all$workload, 
+                               r_data$state$all$available_gls,
+                               r_data$state$all$n_goal)
+      })
+    
+    output$right_plot_1 <- renderPlotly({
+      mke_workload_pie(r_data$state$all$workload)
+      })
+    
+    output$right_plot_2 <- renderPlotly({
+      mke_percent_pie(r_data$state$all$progress_tot)
+    })    
 
   })
 }

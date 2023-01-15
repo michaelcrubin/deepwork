@@ -60,3 +60,9 @@
   
   
 }
+
+/* Plotly glow of % figure inside pie chart */
+.js-plotly-plot .plotly .cursor-pointer {
+    cursor: pointer;
+    text-shadow: 0 0 4px #fff;
+}
