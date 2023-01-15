@@ -156,7 +156,7 @@ shinyApp(
        # image = "https://image.flaticon.com/icons/svg/1149/1149168.svg",
         name = "Be Focused"
       ),
-      sidebarMenu(
+      sidebarMenu(id = "tab_menu",
         sidebarHeader(h4("Goals")),
         menuItem(
           "Day",
@@ -259,6 +259,11 @@ shinyApp(
     # observeEvent(r_control$update_reactive, {
     #   req(r_control$update_reactive)
     #   
+    
+    observe({
+      req(input$tab_menu)
+      r_control$actual_tab <-  input$tab_menu
+    })
   
       
   
@@ -268,7 +273,6 @@ shinyApp(
       #req(F)
       req(r_control$render_weekly)
       req(r_control$render_quarterly)
-      
       # Later more fine graned
       r_data$goal <- read_csv(here("data", "goal.csv")) %>% mutate(open_h = (1 - Progress) * work_h)
       r_data$state <- get_all_states(r_data$goal, params$system_params$domains)

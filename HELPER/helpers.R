@@ -332,7 +332,7 @@ mke_goal_bucket <- function(goal, id, ttl_left, ttl_right, filter_left, filter_r
       text = mke_bucket_ttl(ttl_right, "right", ns),
       input_id = which_column(filter_right),
       options = sortable_options(height = "400px"),
-      labels = filter_goals(goal, filter_right) %>% mke_goal_box(params, ns, edit = FALSE)
+      labels = filter_goals(goal, filter_right) %>% mke_goal_box(params, ns, edit = TRUE)
     )
   )
 }

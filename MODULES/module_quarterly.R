@@ -61,6 +61,16 @@ Quarterly_SERVER <- function(id, r_data, r_control, params) {
       render_status_badge(isolate(r_data$goal), output)
     })
     
+    # 
+    observeEvent(r_control$render_status_badge, {
+
+      req(r_control$render_status_badge)
+      render_status_badge(r_control$render_status_badge, output)
+      update_picker_badge(r_control$render_status_badge, session)
+      
+      r_control$render_quarterly <- TRUE
+    })
+    
    
     ## -----PROGRESS UPDATE ----------
     # listen to update inputs (slider)
@@ -93,6 +103,10 @@ Quarterly_SERVER <- function(id, r_data, r_control, params) {
     # listen to update inputs (slider)
     status_listener <- reactive({
 
+      
+      req((r_control$actual_tab) == "quarterly_id")
+      print("observe quarter")
+
       a<-isolate(r_data$goal) %>% listen_to(input, "all", "_status", "df") %>% 
         mutate(old_Status = Status) %>%
         mutate(Status = value) %>% 
@@ -123,15 +137,7 @@ Quarterly_SERVER <- function(id, r_data, r_control, params) {
     #   render_status_badge(r_control$render_status_badge, output)
     #   r_control$render_quarterly <- TRUE
     # })
-    # 
-    observeEvent(r_control$render_status_badge, {
-      browser()
-      req(r_control$render_status_badge)
-      render_status_badge(r_control$render_status_badge, output)
-      update_picker_badge(r_control$render_status_badge, session)
-      
-      r_control$render_quarterly <- TRUE
-    })
+
     
     ## -----SORTING UPDATE ----------
     # when user rearranges buckets, reacts and stores in DB

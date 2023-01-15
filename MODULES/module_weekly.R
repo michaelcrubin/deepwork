@@ -65,7 +65,7 @@ Weekly_SERVER <- function(id, r_data, r_control, params) {
     observeEvent(r_control$render_status_badge, {
 
       req(r_control$render_status_badge)
-      
+    print("observe week")
       render_status_badge(r_control$render_status_badge, output)
       update_picker_badge(r_control$render_status_badge, session)
       
@@ -102,6 +102,9 @@ Weekly_SERVER <- function(id, r_data, r_control, params) {
     ## -----STATUS UPDATE ----------
     # listen to update inputs (slider)
     status_listener <- reactive({
+
+  
+      req((r_control$actual_tab) == "weekly_id")
 
       s<-isolate(r_data$goal) %>% listen_to(input, "quarter", "_status", "df") %>% 
         mutate(old_Status = Status) %>%
