@@ -5,6 +5,16 @@
 Daily_UI <- function(id, params) {
   ns <- NS(id)
   tagList(
+    tags$head(
+      # Note the wrapping of the string in HTML()
+      tags$style(HTML("
+
+      #day_bucket_left {
+        min-height: 800px;
+        margin-left: 40px;
+      }
+      "))
+    ),
     fluidRow(
       column(10, offset = 0,
              shiny::fluidRow(shiny::h2("Day Focus")),
@@ -38,8 +48,8 @@ Daily_SERVER <- function(id, r_data, r_control, params) {
     ## -----BUCKET RENDERER ----------
     # main bucket rendering
     observe({
-      print("rendering weekly")
-      r_control$rerender_weekly
+      print("rendering daily")
+      r_control$rerender_daily
       render_bucket_list(goal = isolate(r_data$goal),
                          id = "day_bucket",
                          ttl_left = "Focus of Day",

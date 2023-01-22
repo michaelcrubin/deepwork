@@ -19,8 +19,18 @@
     display: block;
 }
 
+.info-box h4 {
+    font-size: 20px;
+    margin-bottom:5px;
+}
 
-    
+.info-box {
+   padding: 5px;
+}
+
+.info-box .progress-group {
+  margin-bottom: 0px;
+}
 
 .info-box .progress {
   background-color: rgba(0,0,0,.125);
@@ -33,10 +43,16 @@
   adding: 0.5rem;
 }
 
+.rank-list-item > .col-sm-12 {
+  padding-right: 0px;
+  padding-left: 0px;
+}
+
 .default-sortable .rank-list-item {
     border-radius: 3px;
     display: block;
-    padding: 10px 8px 10px 8px !important;
+    /*padding: 10px 8px 10px 8px !important;*/
+    padding: 0px 0px 0px 0px !important;
     background-color: #f8f8f8;
     border: 1px solid #ddd;
     overflow: hidden;
@@ -57,12 +73,39 @@
 .rank-list-container p {
   margin-bottom: 0;
   margin-top:0;
-  
+}
+
+
+.day-bucket {
+  height: 800px;
   
 }
+
 
 /* Plotly glow of % figure inside pie chart */
 .js-plotly-plot .plotly .cursor-pointer {
     cursor: pointer;
     text-shadow: 0 0 4px #fff;
 }
+
+
+
+/* BS Colors */
+
+.badge-info {
+    color: #6c757d;
+    background-color: #6c757d3d;
+
+}
+
+.badge-secondary {
+    color: #007bff;
+    background-color: #007bff47;
+}
+
+
+.badge {
+    margin: 0px 3px 0px 3px;
+}
+
+

@@ -8,7 +8,7 @@ mke_status_badge <- function(Status, ...){
          
          "Done" = {dashboardBadge(Status, color = "success")},
          
-         "Not started" = {dashboardBadge(Status, color = "secondary")},
+         "Not started" = {dashboardBadge(Status, color = "primary")},
          
          "Going Well" = {dashboardBadge(Status, color = "warning")},
          
@@ -193,33 +193,76 @@ mke_workload_pie <- function(workload){
 
 ## UI ------------ GOAL BOXES --------------------
 
-# https://plotly.com/r/gauge-charts/
-mke_bucket_ttl <- function(ttl, suffix, ns){
-  
-  tagList(
-    fluidRow(style = "margin-left:0px; margin-right:0px;",
-      column(width = 6,
-             fluidRow(h4(ttl)),
-             fluidRow(shiny::uiOutput(ns(paste0(suffix, "_ttl"))))
-      ),
-      column(width = 3, style = "text-align:right;",
-             plotlyOutput(ns(paste0(suffix, "_plot_1")), height = '85px', width = '90px'),
-      ),
-      column(width = 3, style = "text-align:right;",
-             plotlyOutput(ns(paste0(suffix, "_plot_2")), height = '85px', width = '90px'),
-      )
-  )
+html_ruler <- function(start_h){
+  scl <- seq(start_h, length.out = 9) %>% paste0(.,":00")
+  do.call(
+    what = tags$ul,
+    args = c(class = "ruler", 
+             lapply(scl, function(i) {
+               tagList(
+                 tags$li(
+                   tags$p(HTML("&#8213;"), class = "main_tick"),
+                   tags$p(i, class = "tick_mark"),
+                   tags$ul(class = "sub_ticks",
+                           tags$li(HTML("&#8213;")),
+                           tags$li(HTML("&#8213;")),
+                           tags$li(HTML("&#8213;"))
+                           )))}))
   )
 }
 
+# ruler overflying the leftside
+make_ruler_element <- function(start_h = 8){
+  absolutePanel(style = "position: relative; cursor: inherit; height: 0;",
+                fluidRow(html_ruler(start_h)), left = 0)
+}
+
+# title for bucket with title and graphs
+mke_bkt_ttl <- function(ttl, suffix, ns){
+  tagList(
+    fluidRow(style = "margin-left:0px; margin-right:0px;",
+             column(width = 6,
+                    fluidRow(h4(ttl)),
+                    fluidRow(shiny::uiOutput(ns(paste0(suffix, "_ttl"))))
+             ),
+             column(width = 3, style = "text-align:right;",
+                    plotlyOutput(ns(paste0(suffix, "_plot_1")), height = '85px', width = '90px'),
+             ),
+             column(width = 3, style = "text-align:right;",
+                    plotlyOutput(ns(paste0(suffix, "_plot_2")), height = '85px', width = '90px'),
+             )
+    )
+  )
+}
+
+
+# https://plotly.com/r/gauge-charts/
+# main header makes for bucket
+mke_bucket_header <- function(ttl, suffix, ns, css_id){
+  
+  if (css_id == "day_bucket_left") {
+    tagList(
+      mke_bkt_ttl(ttl, suffix, ns),
+      make_ruler_element()
+    )
+  } else {
+    mke_bkt_ttl(ttl, suffix, ns)
+  }
+}
+
 # makes the header title, subtitle + detail toggle for box
-mke_header <- function(ns, goal_id, Activity, Project, edit){
-  if (edit){
+mke_header <- function(ns, goal_id, Activity, Project, work_h, open_h){
+  #if (edit){
     tagList(
       fluidRow(
         column(width = 10, 
                fluidRow(h4(Activity)),
-               fluidRow(h6(Project))
+               #fluidRow(h6(Project))
+               fluidRow(style = "margin-bottom: 0px;",
+                 dashboardBadge(Project, color = "info", rounded = F),
+                 dashboardBadge(paste(work_h, "h"), color = "secondary", rounded = F),
+                 dashboardBadge(paste(open_h, "h left"), color = "secondary", rounded = F)
+                        )
         ),
         column(width = 2, style = "padding-left: 0px; padding-right: 0px;",
                switchInput(
@@ -230,19 +273,8 @@ mke_header <- function(ns, goal_id, Activity, Project, edit){
                )
         )
       ),
-      tags$hr(style = "margin-top: 0px;margin-bottom: 10px;")
+      tags$hr(style = "margin-top: 7px;margin-bottom: 4px;")
     )
-  } else {
-    tagList(
-      fluidRow(
-        column(width = 12, 
-               fluidRow(h4(Activity)),
-               fluidRow(h6(Project))
-        )
-      ),
-      tags$hr(style = "margin-top: 0px;margin-bottom: 10px;")
-    )
-  }
 }
 
 # makes the Body (details) for box
@@ -257,13 +289,13 @@ mke_body <- function(ns, goal_id, Description, Criteria){
       column(width = 3, h6("Metric")),
       column(width = 9, p(OdsDataHelper::empty_or_value(Criteria, rep = "-")))
     ),
-    tags$hr(style = "margin-top: 0px;margin-bottom: 10px;")
+    tags$hr(style = "margin-top: 0px;margin-bottom: 7px;")
   )
 }
 
 # makes the footer with UI elements (edit or fix mode) for box
 mke_footer <- function(ns, goal_id, Progress, Status, edit){
-  if (edit){
+  #if (edit){
     tagList(
       shinyjs::hidden(fluidRow(id = ns(paste0(goal_id, "_edit_mode")), column(width = 8, mke_slider_progress(ns, goal_id, Progress)), column(width = 4, mke_picker_badges(ns, goal_id, Status)))),
       fluidRow(id = ns(paste0(goal_id, "_view_mode")),
@@ -271,30 +303,22 @@ mke_footer <- function(ns, goal_id, Progress, Status, edit){
                column(width = 4, shiny::uiOutput(ns(paste0(goal_id, "_fixstatus"))))
       )
     )
-  } else {
-    tagList(
-      fluidRow(id = ns(paste0(goal_id, "_view_mode")),
-               column(width = 8, shiny::uiOutput(ns(paste0(goal_id, "_bar")))),
-               column(width = 4, shiny::uiOutput(ns(paste0(goal_id, "_fixstatus"))))
-      )
-    )
-  }
 }
 
 # makes box content of a Box
-mke_content <- function(ns, goal_id, Activity, Project, Status, Progress, Description, Criteria, edit){
+mke_content <- function(ns, goal_id, Activity, Project, Status, Progress, Description, Criteria, work_h, open_h){
 
   column(width = 12,
-         mke_header(ns, goal_id, Activity, Project, edit),
+         mke_header(ns, goal_id, Activity, Project, work_h, open_h),
          shinyjs::hidden(mke_body(ns, goal_id, Description, Criteria)),
          mke_footer(ns, goal_id, Progress, Status, edit)
   )
 }
 
 # makes the Value Box for 1 goal
-make_box <- function(goal_id, Activity, Project, Category, Status, Progress, Description, Criteria, params, ns, edit, ... ){
+make_box <- function(goal_id, Activity, Project, Category, Status, Progress, Description, Criteria, params, ns,work_h, open_h, ... ){
   bs4InfoBox(
-    title = mke_content(ns, goal_id, Activity, Project, Status, Progress, Description, Criteria, edit),
+    title = mke_content(ns, goal_id, Activity, Project, Status, Progress, Description, Criteria, work_h, open_h),
     icon = params$ui_data$category_style %>% dplyr::filter(Category == !!Category) %>% pull(icon) %>% shiny::icon(),
     color = params$ui_data$category_style %>% dplyr::filter(Category == !!Category) %>% pull(bs_color),
     width = 12,
@@ -313,9 +337,6 @@ mke_goal_box <- function(X, ...){
     setNames(X$goal_id)
 }
 
-
-
-
 # Create the entire Sortable Bucket
 mke_goal_bucket <- function(goal, id, ttl_left, ttl_right, filter_left, filter_right, params, ns){
   bucket_list(
@@ -323,20 +344,23 @@ mke_goal_bucket <- function(goal, id, ttl_left, ttl_right, filter_left, filter_r
     group_name = ns(id),
     orientation = "horizontal",
     add_rank_list(
-      text = mke_bucket_ttl(ttl_left, "left", ns),
+      text = mke_bucket_header(ttl_left, "left", ns, paste0(id, "_left")),
       input_id = which_column(filter_left),
       options = sortable_options(height = "400px"),
-      labels = filter_goals(goal, filter_left) %>% mke_goal_box(params, ns, edit = TRUE)
+      labels = filter_goals(goal, filter_left) %>% mke_goal_box(params, ns),
+      #class = c("custom-sortable"), # add custom style
+      css_id = paste0(id, "_left")
+      
     ),
     add_rank_list(
-      text = mke_bucket_ttl(ttl_right, "right", ns),
+      text = mke_bucket_header(ttl_right, "right", ns, paste0(id, "_right")),
       input_id = which_column(filter_right),
       options = sortable_options(height = "400px"),
-      labels = filter_goals(goal, filter_right) %>% mke_goal_box(params, ns, edit = TRUE)
+      labels = filter_goals(goal, filter_right) %>% mke_goal_box(params, ns),
+      css_id = paste0(id, "_right")
     )
   )
 }
-
 
 
 ## DATA ------------ HANDLING HELPER --------------------

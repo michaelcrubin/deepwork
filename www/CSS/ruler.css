@@ -1,0 +1,66 @@
+
+
+.ruler {
+  list-style: none;
+  margin-left: 0;
+  padding-left: 10px;
+  margin-top: 5px;
+}
+
+.sub_ticks {
+  list-style: none;
+  margin-left: 0;
+  padding-left: 0px;
+}
+/*
+.ruler > li {
+  color: #6c757d;
+  font-size: 20px;
+  font-weight: 100;
+  
+}
+*/
+.main_tick {
+    color: #6c757d80;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+    line-height: 0px;
+    font-size: 25px;
+    font-weight: 100;
+    margin-left: -5px;
+    padding-left: 0px;
+}
+
+.tick_mark {
+    color: #6c757d80;
+    font-size: 13px;
+    font-weight: 100;
+    padding-top: 0px;
+    text-align: right;
+    padding-right: 5px;
+    padding-bottom: 0px;
+    line-height: 0;
+    margin-bottom: 15px !important;
+    margin-top: 10px !important;
+}
+
+.ruler > p {
+
+}
+.sub_ticks li {
+  padding-top: 25px;
+  color: #6c757d80;
+  font-size: 10px;
+  font-weight: 100;
+  line-height: 0px;
+}
+
+.sub_ticks li:last-child {
+  padding-bottom: 25px;
+}
+
+.sub_ticks li:first-child {
+  padding-top: 0px;
+}

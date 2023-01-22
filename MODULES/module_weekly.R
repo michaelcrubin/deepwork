@@ -134,6 +134,8 @@ Weekly_SERVER <- function(id, r_data, r_control, params) {
       
       # which other buckets to update
       r_control$rerender_daily <- OdsUIHelper::reactive_trigger()
+      r_control$rerender_daily <- OdsUIHelper::reactive_trigger()
+      
     })
     
     

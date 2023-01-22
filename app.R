@@ -223,7 +223,8 @@ shinyApp(
 # App Body -----------------------------------------------------------------
     
     body = dashboardBody(
-      tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "CSS/prov_css.css")),
+      tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "CSS/prov_css.css"),
+                tags$link(rel = "stylesheet", type = "text/css", href = "CSS/ruler.css")),
       useShinyjs(),
       
       tabItems(
