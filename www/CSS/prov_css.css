@@ -108,4 +108,37 @@
     margin: 0px 3px 0px 3px;
 }
 
+.stripes {
+  background: repeating-linear-gradient(
+  145deg,
+  #6c757d3d 1px,
+  #6c757d10 2px,
+  #6c757d10 11px,
+  #6c757d3d 12px,
+  #6c757d3d 20px 
+  );
+}
 
+.stripes p {
+
+    /* position: relative; */
+    /* top: 20px; */
+    /* left: 20px; */
+    font-size: 16px;
+    font-weight: 900;
+    color: #f8f9fa;
+    text-shadow: 0 0 5px #6c757d;
+    /* text-align: center; */
+    /* width: 100%; */
+    /* vertical-align: middle; */
+    /* height: 100%; */
+    margin: 0;
+    display: inline-block;
+    vertical-align: middle;
+   /*  position: absolute; */
+    text-align: center;
+   /*  top: 50%; */
+   /*  left: 50%; */
+  /*   -ms-transform: translate(-50%, -50%); */
+  /*   transform: translate(-50%, -50%); */
+}

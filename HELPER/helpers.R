@@ -70,6 +70,45 @@ mke_picker_badges <- function(ns, goal_id, Status){
   )
 }
 
+# makes a progress slider (0-100%)
+mke_numeric_workh <- function(ns, goal_id, wip_h){
+  shiny::numericInput(
+    inputId = ns(paste0(goal_id, "_wiph")),
+    label = NULL,
+    value = null_or_value(wip_h),
+    min = 0,
+    max = 8,
+    step = 0.25,
+    width = '100px'
+  )
+}
+
+
+mke_today_workh <- function(goal_id, wip_h = 1, ...){
+  px <- wip_h %>% magrittr::subtract(1) %>% max(0) %>% min(8) %>% 
+    magrittr::multiply_by(100) %>% magrittr::add(18)
+  
+  fluidRow(
+    #id = ns(paste0(goal_id, "_wiph_stripe")),
+    class = "stripes", style = paste0("margin-bottom: 0px;  height: ",px,"px;"),
+    tags$p(style = paste0("line-height: ",px,"px;"), 
+           paste("Working on it for", min(wip_h, 8), "h...")
+    )
+  )
+}
+
+mke_subheader <- function(goal_id, Project, work_h, open_h, wip_h = 1, ...){
+  fluidRow(
+    #id = ns(paste0(goal_id, "_sub_header")),
+    style = "margin-bottom: 0px;",
+    dashboardBadge(Project, color = "secondary", rounded = F),
+    dashboardBadge(paste("Total", work_h, "h"), color = "info", rounded = F),
+    dashboardBadge(paste(open_h, "h left"), color = "info", rounded = F),
+    dashboardBadge(paste("Next slice", wip_h, "h"), color = "info", rounded = F)
+  )
+}
+
+
 # workload recommendation badge
 workload_recommend_badge <- function(workload, available_gls, n_goal){
 
@@ -191,10 +230,11 @@ mke_workload_pie <- function(workload){
 
 
 
-## UI ------------ GOAL BOXES --------------------
+## UI ------------ BUCKET HEADER --------------------
 
+# creates the vertical HTML Ruler
 html_ruler <- function(start_h){
-  scl <- seq(start_h, length.out = 9) %>% paste0(.,":00")
+  scl <- seq(start_h, length.out = 11) %>% paste0(.,":00")
   do.call(
     what = tags$ul,
     args = c(class = "ruler", 
@@ -250,35 +290,111 @@ mke_bucket_header <- function(ttl, suffix, ns, css_id){
   }
 }
 
+
+## UI ------------ GOAL BOXES --------------------
+
+
+# # makes the progress strip for the working today part
+# today_workh_section <- function(ns, goal_id, css_id, wip_h = 1){
+#   px <- wip_h %>% magrittr::subtract(1) %>% max(0) %>% min(8) %>% 
+#     magrittr::multiply_by(100) %>% magrittr::add(18)
+#   if (css_id == "day_bucket_left") {
+#     fluidRow(
+#       id = ns(paste0(goal_id, "_wiph_stripe")),
+#       class = "stripes", style = paste0("margin-bottom: 0px;  height: ",px,"px;"),
+#       tags$p(style = paste0("line-height: ",px,"px;"), 
+#              paste("Working on it for", min(wip_h, 8), "h...")
+#       )
+#     )
+#   } else {
+#     shinyjs::hidden(
+#       fluidRow(
+#         id = ns(paste0(goal_id, "_wiph_stripe")),
+#         class = "stripes", style = paste0("margin-bottom: 0px;  height: ",px,"px;"),
+#         tags$p(style = paste0("line-height: ",px,"px;"), 
+#                paste("Working on it for", min(wip_h, 8), "h...")
+#         )
+#       )
+#     )
+#   }
+# }
+# 
+# # makes the subheader for projects and open hours
+# general_subheader <- function(ns, goal_id, Project, work_h, open_h, css_id, wip_h = 1){
+#   
+#   if (css_id == "day_bucket_left") {
+#     shinyjs::hidden(
+#       fluidRow(
+#         shiny::uiOutput(ns(paste0(goal_id, "_bar"))),
+#         shiny::uiOutput(ns(paste0(goal_id, "_bar"))), 
+#         id = ns(paste0(goal_id, "_sub_header")),
+#         style = "margin-bottom: 0px;",
+#         dashboardBadge(Project, color = "secondary", rounded = F),
+#         dashboardBadge(paste("Total", work_h, "h"), color = "info", rounded = F),
+#         dashboardBadge(paste(open_h, "h left"), color = "info", rounded = F),
+#         dashboardBadge(paste("Next slice", wip_h, "h"), color = "info", rounded = F)
+#       )
+#     )
+#   } else {
+#     fluidRow(
+#       id = ns(paste0(goal_id, "_sub_header")),
+#       style = "margin-bottom: 0px;",
+#       dashboardBadge(Project, color = "secondary", rounded = F),
+#       dashboardBadge(paste("Total", work_h, "h"), color = "info", rounded = F),
+#       dashboardBadge(paste(open_h, "h left"), color = "info", rounded = F),
+#       dashboardBadge(paste("Next slice", wip_h, "h"), color = "info", rounded = F)
+#     )
+#   }
+# }
+
+today_workh_section <- function(ns, goal_id, css_id, wip_h = 1){
+  if (css_id == "day_bucket_left") {
+    shiny::uiOutput(ns(paste0(goal_id, "_wiph_render")))
+  } else {
+    shinyjs::hidden(shiny::uiOutput(ns(paste0(goal_id, "_wiph_render"))) )
+  }
+}
+
+# makes the subheader for projects and open hours
+general_subheader <- function(ns, goal_id, Project, work_h, open_h, css_id, wip_h = 1){
+  if (css_id == "day_bucket_left") {
+    shiny::uiOutput(ns(paste0(goal_id, "_sbh_render")))
+  } else {
+    shinyjs::hidden(shiny::uiOutput(ns(paste0(goal_id, "_sbh_render"))) )
+  }
+
+}
+
 # makes the header title, subtitle + detail toggle for box
-mke_header <- function(ns, goal_id, Activity, Project, work_h, open_h){
-  #if (edit){
-    tagList(
-      fluidRow(
-        column(width = 10, 
-               fluidRow(h4(Activity)),
-               #fluidRow(h6(Project))
-               fluidRow(style = "margin-bottom: 0px;",
-                 dashboardBadge(Project, color = "info", rounded = F),
-                 dashboardBadge(paste(work_h, "h"), color = "secondary", rounded = F),
-                 dashboardBadge(paste(open_h, "h left"), color = "secondary", rounded = F)
-                        )
-        ),
-        column(width = 2, style = "padding-left: 0px; padding-right: 0px;",
-               switchInput(
-                 inputId = ns(paste0(goal_id, "_toggle")),
-                 onLabel = icon("edit"),
-                 offLabel = icon("edit"),
-                 size = "mini"
-               )
-        )
+mke_header <- function(ns, goal_id, Activity, Project, work_h, open_h, wip_h, css_id){
+  tagList(
+    fluidRow(#style = "margin-bottom: 2px;",
+      column(width = 10, 
+             fluidRow(h4(Activity)),
+             
       ),
-      tags$hr(style = "margin-top: 7px;margin-bottom: 4px;")
-    )
+      column(width = 2, style = "padding-left: 0px; padding-right: 0px;",
+             switchInput(
+               inputId = ns(paste0(goal_id, "_toggle")),
+               onLabel = icon("edit"),
+               offLabel = icon("edit"),
+               size = "mini"
+             )
+      )
+    ),
+               
+    tags$div(id = ns(paste0(goal_id, "_wiph_stripe")),
+             today_workh_section(ns, goal_id, css_id, wip_h)
+             ),
+    tags$div(id = ns(paste0(goal_id, "_sub_header")),
+             general_subheader(ns, goal_id, Project, work_h, open_h, css_id, wip_h),
+    ),
+    tags$hr(style = "margin-top: 7px;margin-bottom: 4px;")
+  )
 }
 
 # makes the Body (details) for box
-mke_body <- function(ns, goal_id, Description, Criteria){
+mke_body <- function(ns, goal_id, Description, Criteria, wip_h){
   tags$div(
     id = ns(paste0(goal_id, "_body")),
     fluidRow(
@@ -289,13 +405,16 @@ mke_body <- function(ns, goal_id, Description, Criteria){
       column(width = 3, h6("Metric")),
       column(width = 9, p(OdsDataHelper::empty_or_value(Criteria, rep = "-")))
     ),
-    tags$hr(style = "margin-top: 0px;margin-bottom: 7px;")
+    fluidRow(
+      column(width = 3, h6("Next Slice")),
+      column(width = 9, mke_numeric_workh(ns, goal_id, wip_h))
+    ),
+    tags$hr(style = "margin-top: 7px;margin-bottom: 7px;")
   )
 }
 
 # makes the footer with UI elements (edit or fix mode) for box
-mke_footer <- function(ns, goal_id, Progress, Status, edit){
-  #if (edit){
+mke_footer <- function(ns, goal_id, Progress, Status){
     tagList(
       shinyjs::hidden(fluidRow(id = ns(paste0(goal_id, "_edit_mode")), column(width = 8, mke_slider_progress(ns, goal_id, Progress)), column(width = 4, mke_picker_badges(ns, goal_id, Status)))),
       fluidRow(id = ns(paste0(goal_id, "_view_mode")),
@@ -306,19 +425,19 @@ mke_footer <- function(ns, goal_id, Progress, Status, edit){
 }
 
 # makes box content of a Box
-mke_content <- function(ns, goal_id, Activity, Project, Status, Progress, Description, Criteria, work_h, open_h){
+mke_content <- function(ns, goal_id, Activity, Project, Status, Progress, Description, Criteria, work_h, open_h, wip_h, css_id){
 
   column(width = 12,
-         mke_header(ns, goal_id, Activity, Project, work_h, open_h),
-         shinyjs::hidden(mke_body(ns, goal_id, Description, Criteria)),
-         mke_footer(ns, goal_id, Progress, Status, edit)
+         mke_header(ns, goal_id, Activity, Project, work_h, open_h, wip_h, css_id ),
+         shinyjs::hidden(mke_body(ns, goal_id, Description, Criteria, wip_h)),
+         mke_footer(ns, goal_id, Progress, Status)
   )
 }
 
 # makes the Value Box for 1 goal
-make_box <- function(goal_id, Activity, Project, Category, Status, Progress, Description, Criteria, params, ns,work_h, open_h, ... ){
+make_box <- function(goal_id, Activity, Project, Category, Status, Progress, Description, Criteria, params, ns,work_h, open_h, wip_h, css_id, ... ){
   bs4InfoBox(
-    title = mke_content(ns, goal_id, Activity, Project, Status, Progress, Description, Criteria, work_h, open_h),
+    title = mke_content(ns, goal_id, Activity, Project, Status, Progress, Description, Criteria, work_h, open_h, wip_h, css_id),
     icon = params$ui_data$category_style %>% dplyr::filter(Category == !!Category) %>% pull(icon) %>% shiny::icon(),
     color = params$ui_data$category_style %>% dplyr::filter(Category == !!Category) %>% pull(bs_color),
     width = 12,
@@ -347,7 +466,7 @@ mke_goal_bucket <- function(goal, id, ttl_left, ttl_right, filter_left, filter_r
       text = mke_bucket_header(ttl_left, "left", ns, paste0(id, "_left")),
       input_id = which_column(filter_left),
       options = sortable_options(height = "400px"),
-      labels = filter_goals(goal, filter_left) %>% mke_goal_box(params, ns),
+      labels = filter_goals(goal, filter_left) %>% mke_goal_box(params, ns, css_id = paste0(id, "_left")),
       #class = c("custom-sortable"), # add custom style
       css_id = paste0(id, "_left")
       
@@ -356,7 +475,7 @@ mke_goal_bucket <- function(goal, id, ttl_left, ttl_right, filter_left, filter_r
       text = mke_bucket_header(ttl_right, "right", ns, paste0(id, "_right")),
       input_id = which_column(filter_right),
       options = sortable_options(height = "400px"),
-      labels = filter_goals(goal, filter_right) %>% mke_goal_box(params, ns),
+      labels = filter_goals(goal, filter_right) %>% mke_goal_box(params, ns, css_id = paste0(id, "_right") ),
       css_id = paste0(id, "_right")
     )
   )
@@ -561,6 +680,8 @@ update_ui_element <- function(type, id, value, output = NULL, session = NULL, ..
          
          "SliderInput" = {updateSliderTextInput(session = session, inputId = id, selected = value)},
          
+         "NumericInput" = {updateNumericInput(session = session, inputId = id, value = value)},
+         
          {NULL}
          
   )
@@ -579,6 +700,33 @@ render_progress_bar <- function(goal, output){
     id = paste0(goal_id, "_bar"),
     value = pmap(., .f = mke_progress_bar)) %>% 
     pwalk(., .f = update_ui_element, output = output, type = "render")
+}
+
+# renders all goals progress bar functions
+render_wip_h <- function(goal, output){
+  # updating the slider
+
+  a<-goal %>% mutate(
+    id = paste0(goal_id, "_wiph_render"),
+    value = pmap(., .f = mke_today_workh)) %>% 
+    pwalk(., .f = update_ui_element, output = output, type = "render")
+}
+
+# renders all goals progress bar functions
+render_subheader <- function(goal, output){
+  # updating the slider
+  goal %>% mutate(
+    id = paste0(goal_id, "_sbh_render"),
+    value = pmap(., .f = mke_subheader)) %>% 
+    pwalk(., .f = update_ui_element, output = output, type = "render")
+}
+
+# updates a picker badge from goals 
+update_number_wiph <- function(goal, session){
+  goal %>% mutate(
+    id = paste0(goal_id, "_wiph"),
+    value = wip_h) %>% 
+    pwalk(., .f = update_ui_element, session = session, type = "NumericInput")
 }
 
 # renders all goals progress bar functions
@@ -620,6 +768,20 @@ toggle_edit_mode <- function(id, flag, ...){
     shinyjs::hide(paste0(id, "_body"))
     shinyjs::hide(paste0(id, "_edit_mode"))
     shinyjs::show(paste0(id, "_view_mode"))
+  }
+}
+
+toggle_wiph_sbh <- function(id, flag, ...){
+  # is day
+  browser()
+  if (isTRUE(flag)){
+    shinyjs::show(paste0(id, "_wiph_stripe"))
+    shinyjs::hide(paste0(id, "_sub_header"))
+  } 
+  # is not day
+  else {
+    shinyjs::show(paste0(id, "_sub_header"))
+    shinyjs::hide(paste0(id, "_wiph_stripe"))
   }
 }
 ## ------------ DATA TABLE MODULE --------------------

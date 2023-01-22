@@ -1,5 +1,10 @@
 
 
+#day_bucket_left {
+  min-height: 1000px;
+  margin-left: 40px;
+}
+
 .ruler {
   list-style: none;
   margin-left: 0;

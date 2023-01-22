@@ -155,6 +155,25 @@ Weekly_SERVER <- function(id, r_data, r_control, params) {
       input_vec %>% iwalk(~toggle_edit_mode(id = .y, flag = .x))
     })
     
+    ## -----SHOW AND HIDE WIP OR SUBHEADER ----------
+    
+    # listen to day stuff
+    isday_listener <- reactive({
+      req(r_control$actual_tab == "weekly_id")
+      input_vec <- (r_data$goal) %>% mutate(dummy = FALSE) %>% 
+        df_to_lst(vals = "dummy", nms = "goal_id")
+    })
+    
+    # observe to toggle the Wip vs Subheader section
+    observe({
+      input_vec <- isday_listener()
+      
+      req(length(input_vec) > 0)
+      print("toggle wip and subh")
+      input_vec %>% iwalk(~toggle_wip_sbh(id = .y, flag = .x))
+    })
+    
+    
     ## -----RENDERING TITLE TEXT + PLOTS ----------
   
     # left title and plots

@@ -1,6 +1,6 @@
-goal_id,quarter,week,day,Activity,Project,Category,Status,Continous,Progress,work_h,Planned,Concluded,Description,Criteria,Comment,open_h
-gl00080,TRUE,TRUE,TRUE,Reduce Alcohol 3,Alcohol,Health & Lifestyle,Going Well,NA,0.1,30,30.06.23,NA,Reduce Alcohol: be completely off alcohol,some text,NA,27
-gl00084,TRUE,TRUE,TRUE,Income Streams 3,DiverseInvest,Job & Purpose,Going Well,NA,0.93,10,31.12.22,NA,Find 1-3 Short-Term income stream to cover all costs,USD 7500 per quarter,possibly to be replaced by ODAPES,0.6999999999999995
-gl00086,FALSE,FALSE,FALSE,Kill the depression wo medics,MentalHealth,Health & Lifestyle,Going Well,In Focus,0.4,2,30.06.23,NA,Reduces medics to zero and kill finally the depression.,No more medics + stable mood,Mostly linked to alcohol consumption,1.2
-gl00076,FALSE,FALSE,FALSE,Kids,Plan,Family & Relationships,Done,NA,0.18,5,30.06.22,NA,Decide what to do with kids,some text,NA,4.1000000000000005
-gl00081,TRUE,TRUE,TRUE,Personal Brand,DiverseInvest,Job & Purpose,Going Bad,NA,0.24,1,30.06.23,NA,"Define Personal Branding (slogan, story, resume etc..)",a short Branding Deck,NA,0.76
+goal_id,quarter,week,day,Activity,Project,Category,Status,Continous,Progress,work_h,Planned,Concluded,Description,Criteria,Comment,open_h,wip_h
+gl00080,TRUE,TRUE,FALSE,Reduce Alcohol 3,Alcohol,Health & Lifestyle,Going Well,NA,0.56,30,30.06.23,NA,Reduce Alcohol: be completely off alcohol,some text,NA,13.2,3
+gl00084,TRUE,TRUE,FALSE,Income Streams 3,DiverseInvest,Job & Purpose,Going Well,NA,0.38,10,31.12.22,NA,Find 1-3 Short-Term income stream to cover all costs,USD 7500 per quarter,possibly to be replaced by ODAPES,6.2,5
+gl00076,TRUE,TRUE,FALSE,Kids,Plan,Family & Relationships,Going Bad,NA,0.43,5,30.06.22,NA,Decide what to do with kids,some text,NA,2.8500000000000005,3.5
+gl00081,TRUE,TRUE,TRUE,Personal Brand,DiverseInvest,Job & Purpose,Going Bad,NA,0.7,1,30.06.23,NA,"Define Personal Branding (slogan, story, resume etc..)",a short Branding Deck,NA,0.30000000000000004,5
+gl00086,TRUE,TRUE,TRUE,Kill the depression wo medics,MentalHealth,Health & Lifestyle,Not started,In Focus,1,2,30.06.23,NA,Reduces medics to zero and kill finally the depression.,No more medics + stable mood,Mostly linked to alcohol consumption,0,2.75

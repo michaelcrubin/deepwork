@@ -224,7 +224,9 @@ shinyApp(
     
     body = dashboardBody(
       tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "CSS/prov_css.css"),
-                tags$link(rel = "stylesheet", type = "text/css", href = "CSS/ruler.css")),
+                tags$link(rel = "stylesheet", type = "text/css", href = "CSS/ruler.css")
+                #tags$link(rel = "stylesheet", type = "text/css", href = "CSS/moving_stripes.css")
+                ),
       useShinyjs(),
       
       tabItems(

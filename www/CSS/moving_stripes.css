@@ -1,0 +1,64 @@
+
+
+
+.stripes {
+  background: repeating-linear-gradient(
+  145deg,
+  #f8e9db 1px,
+  #fff5ed 2px,
+  #fff5ed 11px,
+  #f8e9db 12px,
+  #f8e9db 20px 
+  );
+}
+/*
+:root {
+	--stripes-size: 110px;
+}
+
+
+
+body {
+	width: 100%;
+	height: 100vh;
+	overflow: hidden;
+}
+
+
+
+.stripes {
+		position: absolute;
+		content: "";
+		top: 0;
+		left: 0;
+		height: 100%;
+		width: calc(100% + 110px);
+		background: repeating-linear-gradient(
+			45deg,
+			black 25%,
+			black 50%,
+			yellow 50%,
+			yellow 75%
+		);
+		background-size: 110px 110px;
+		animation: animateStripes 2s linear infinite;
+}
+
+.stripes::after {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		content: "";
+		background: radial-gradient(ellipse at center, rgba(black, 0) 0%, black 100%);
+	}
+}
+
+@keyframes animateStripes {
+	0% {
+		transform: translateX(0);
+	}
+	100% {
+		transform: translateX(-110px);
+	}
+}
+*/
