@@ -1,0 +1,178 @@
+/* */
+
+/* dont know for what but must be for some flymenu stuff*/
+.pretty input:checked~.state.p-success label:after, .pretty.p-toggle .state.p-success label:after {
+  background-color: #527E67 !important;
+}
+
+
+/* Flymenu Style different aspects*/
+.flymenu_txt {
+  font-weight: 400;
+  margin: 0px 0px 0px 0px;;
+  font-family: "Open Sans", sans-serif;
+  font-size: 16px;
+  color: #333333;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Flymenu rows and hover effect*/
+.flymenu_row {
+  margin-right: -5px;
+  margin-left: -10px;
+  padding-left: 6px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}                           
+
+.flymenu_row .form-group {
+  margin-bottom:0px;
+}
+
+.flymenu_row:hover {
+  background: #55555521;
+}
+
+/*Alignment of height text for checkbox and button in flymenu */
+.check_mini label {
+  vertical-align: bottom;
+}
+                              
+/* Buttons in flymenu to select maps or elements. size and focus when clicked*/
+.btn_mini {
+  width: 19px;
+  height: 19px;
+  padding: 1px;
+  text-align: center;
+}
+                              
+.btn_mini:focus {
+  background: #5cb85c; 
+}
+
+
+/* buttons on leaflet pane, need to invert colors */
+ .btn_leaflet {
+   width: inherit;
+   height: inherit;
+   padding: 3px;
+   font-size: 18px;
+   border-radius: 3px;
+   min-width: 20px;
+   margin-top:7px;
+   margin-bottom:7px;
+ }
+ 
+ 
+/* simple HTML Tag */
+
+.html_tag {
+  color: #ffffff;
+  background-color: #7ba82e; /* NEEDS TO BE CLIENT COLOR*/
+  font-weight:bold;
+  border-radius: 4px; 
+  margin: 10px 3px 10px 3px;
+  padding: 3px 5px 3px 5px;
+  opacity: 0.7;
+  line-height: 1.7;
+}
+
+/*  HTML Link Tag */
+a.html_link_tag {
+  box-shadow: inset 200px 0 0 0 #F0F0F0;
+  transition: color .5s ease-in-out, box-shadow .5s ease-in-out;
+  text-decoration: none;
+  font-weight:bold;
+  border-radius: 4px; 
+  margin: 10px 3px 10px 3px;
+  padding: 3px 5px 3px 5px;
+  opacity: 1;
+  line-height: 1.7;
+}
+
+a.html_link_tag:hover {
+  color: #ffffff !important;
+  background-color: #7ba82e;/* NEEDS TO BE CLIENT COLOR*/
+  box-shadow: inset 0 0 0 0 #F0F0F0;
+  text-decoration: none;
+  padding: 4px 6px 4px 6px;
+  opacity: 0.85;
+}
+
+
+/*
+.html_link {
+  box-shadow: inset 0 0 0 0 #54b3d6;
+  color: #54b3d6;
+  margin: 0 -.25rem;
+  padding: 0 .25rem;
+  transition: color .3s ease-in-out, box-shadow .3s ease-in-out;
+}
+.html_link:hover {
+  box-shadow: inset 100px 0 0 0 #54b3d6;
+  color: white;
+}
+*/
+
+ 
+/* POPUP Bubble */
+.bubble {
+  height: auto;
+  opacity: 0.9;
+  max-height: 60vh;
+  width: auto;
+  min-width: 13.02vw;
+  max-width: 38vw;
+  overflow-y: scroll;
+  background: #fff;
+  display: block;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+
+/* POPUP Pointer */
+.pointer {
+  height: 0px;
+  width: 0px;
+  opacity: 0.9;
+  background: transparent;
+  margin: 0 auto;
+  border-radius: 0 0 3px 0;
+  margin-top: 0;
+  position: relative;
+  border-left: 1.3vw solid transparent;
+  border-right: 1.3vw  solid transparent;
+  border-top: 2.9vh solid #fff;
+}
+
+.bubble .form-group {
+    margin-bottom: 0px;
+}
+
+.footer_text {
+  font-size: 14px;
+  font-family: "Arial narrow";
+  font-style: italic;
+  font-weight: 300;
+  margin-bottom: 0px;
+  color: #A9A9A9;
+}
+
+/* COLOR FROM STYLE */
+.small_map {
+    border: 2px solid  #7ba82e;/* NEEDS TO BE CLIENT COLOR*/
+    border-radius: 8px; 
+    margin: 10px 0px 10px 0px;
+    overflow: clip;
+}
+
+.small_map .leaflet-top {
+  top: 20px;
+}
+
+
+

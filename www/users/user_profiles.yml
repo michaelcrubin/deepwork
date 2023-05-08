@@ -1,0 +1,293 @@
+## DESCRIPTION:
+# ODAPES DEFAULT PROFILE
+# AT THIS MOMENT USED FOR ALL CLIENTS
+
+
+###------- ADMIN PROFILES ---------
+# This defines the Menu showing by each user Type
+admin:
+  # RIGHTS / ACCESS
+  admin: TRUE
+  superadmin: FALSE
+  profile_name: "admin"
+  
+
+  # MAP TAB
+  # high level // what list type
+  mapmenu_available: TRUE  # is there a manu at all
+  map_structure: fieldmanager   # none, simple, complete, fieldmanager
+  element_menu_type : complete   # none, simple, complete
+  reverse_order: F # first map or element tab (of flying menu)
+  start_mapmenu_open: TRUE # map menu initially open
+
+  # WHAT MAP TYPES ARE AVAILABLE
+  available_map_types:  ["border", "numeric", "not_useful"] #what the user can add (select when adding pin)
+
+
+  # details of Element Tab
+  elem_tab_name: "Elementos" # // // UNNECESSARY
+  show_menu_elements: ["btn_add_manual", "btn_edit_manual", "btn_add_api", "btn_upload_csv"]
+  show_element_timeselect: TRUE
+
+  # WHAT ELEMENTS TYPES ARE AVAILABLE WHERE
+  available_element_types:  ["ME", "AM", "FE", "WS"] #what the user can add (select when adding pin)
+  elem_render: ["AM", "WS", "ME", "WS"] # what elem types are rendered at all
+  elem_types_menu:  ["ME", "AM", "WS", "WS"] #what elem types are we displaying in the element list menu
+
+  # no need anymore
+  elem_has_lbl: ["AM", "WS", "ME"] # what elem types do have labels
+  elem_lbl_preprint: ["AM", "WS"]  # what elem types have preprinted labels
+  elem_types_stshow:  ["AM", "WS"] #what elem types are we showing in startup // NOTE: SHOULD NOT BE THE SAME AS PRE-PRINT OW IT'S PRINTING THEM ANYWAY AT STARTUP
+
+  # details of map tab
+  layer_tab_name: "Mapas" # // // UNNECESSARY
+  show_menu_layer: ["btn_open_polygon", "btn_upload_layer","btn_open_interpole","btn_open_classify", "btn_open_dosage", "btn_open_tracker"]
+  
+  layer_types_menu:  ["POLYGON_SIMPLE"] #what is that for?????
+  layer_types_stshow: ["POLYGON_SIMPLE"] #what layer types are we showing in startup
+  exclude_from_render: ["Zero_Point", "Perp_Grid"]
+  polygon_popups: TRUE
+  point_popups: TRUE
+
+
+
+
+  # DATA ANALYZER TAB
+  analyaermenu_available: TRUE
+  start_analyaermenu_open: TRUE
+
+  show_analyzer_elements: {element: TRUE, time_range: TRUE, ref_date: TRUE, graphs: TRUE, cum_func: TRUE, func_timing: TRUE, shading: TRUE}
+  graph_choices: ["graphclimate", "graphspray", "graphsoilvwc", "grapegraph", "graphNDVI"]
+  default_time_range: "168"
+  default_graphs: "graphclimate"
+  default_cum_func: "value"
+  default_func_timing: "24"
+  default_cache_func: "ods_aggregate"
+
+  shading_choices: ["Events", "Phases", "Ranges", "Limits"] #["Events", "Phases", "Ranges", "Limits"]
+  shading_choices_status: ["info", "danger", "success", "danger"] #["info", "danger", "success", "danger"]
+  default_shading: {events: FALSE, limits: FALSE, ranges: FALSE, phases: FALSE}
+
+  show_menu_meta: [] #
+
+  # Menu in Settings Pane
+  show_events_set: TRUE # // NOT NEEDED (CAN BE VIA OTHER EXCELS)
+  own_events: TRUE # // NOT NEEDED (CAN BE VIA OTHER EXCELS)
+  event_max_reps: 3 # // NOT NEEDED (CAN BE VIA OTHER EXCELS)
+  event_max_extent: 10000 # // NOT NEEDED (CAN BE VIA OTHER EXCELS)
+
+  show_agrodata_set: TRUE # unneeded
+  edit_agrodata: TRUE # unneeded
+
+  show_elements_set: TRUE # unneeded
+  edit_elements: TRUE # unneeded
+  delete_elements: TRUE # unneeded
+
+  show_maps_set: TRUE # unneeded
+  upload_maps: TRUE # unneeded
+  delete_maps: TRUE # unneeded
+  download_maps: TRUE  # unneeded
+  download_formats: {GeoTiff: ".tif", Shape: ".shp", Excel: ".xls"}
+
+###------- USER PROFILES ---------
+# This defines the Menu showing by each user Type
+user:
+  # RIGHTS / ACCESS
+  admin: FALSE
+  superadmin: FALSE
+  profile_name: "user"
+
+  # TAB NAMES
+  tabname_dash: Dashboard
+  tabname_map: Map
+  tabname_data: Data
+  tabname_setting: Settings
+  tabname_admin: Admin
+  tabname_table: Fields
+
+  # DASHBOARD TAB
+  edit_order: TRUE
+  riskbox1_menu: TRUE
+  riskbox2_menu: TRUE
+  weather_menu: TRUE
+  dris_menu: TRUE
+  agmet_menu: TRUE
+  gdd_menu: TRUE
+  soilmenu: TRUE
+
+
+  # MAP TAB
+  # high level // what list type
+  mapmenu_available: TRUE  # is there a manu at all
+  map_structure: simple   # none, simple, fieldmanager
+  element_menu_type : simple   # none, simple, complete
+  reverse_order: T # first map or element tab (of flying menu)
+  start_mapmenu_open: T # map menu initially open
+
+  # details of Element Tab
+  elem_tab_name: "Clima"
+  show_menu_elements: []
+  show_element_timeselect: FALSE
+
+  # WHAT ELEMENTS TYPES ARE AVAILABLE WHERE
+  available_element_types:  [] #what the user can add (select when adding pin)
+  elem_render: ["AM"] # what elem types are rendered at all
+  elem_types_menu:  ["AM"] #what elem types are we displaying in the element list menu
+
+  elem_has_lbl: ["AM"] # what elem types do have labels
+  elem_lbl_preprint: ["AM"]  # what elem types have preprinted labels
+  elem_types_stshow:  ["AM"] #what elem types are we showing in startup // NOTE: SHOULD NOT BE THE SAME AS PRE-PRINT OW IT'S PRINTING THEM ANYWAY AT STARTUP
+  # details of map tab
+  layer_tab_name: "Mapas"
+  show_menu_layer: ["btn_upload_layer"]
+  
+  layer_types_menu:  ["POLYGON_SIMPLE"] #what is that for?????
+  layer_types_stshow: ["POLYGON_SIMPLE"] #what layer types are we showing in startup
+  exclude_from_render: ["Zero_Point", "Perp_Grid"]
+  polygon_popups: TRUE
+  point_popups: TRUE
+
+
+ #/ update_print_data / label_by_field / render_proxy_map
+
+  # DATA ANALYZER TAB
+  analyaermenu_available: FALSE
+  start_analyaermenu_open: FALSE
+
+  show_analyzer_elements: {element: TRUE, time_range: TRUE, ref_date: FALSE, graphs: FALSE, cum_func: FALSE, func_timing: FALSE, shading: FALSE}
+  graph_choices: []
+  default_time_range: "168"
+  default_graphs: "graphclimate"
+  default_cum_func: "value"
+  default_func_timing: "24"
+  default_cache_func: "ods_aggregate"
+
+  shading_choices: ["Events", "Phases", "Ranges", "Limits"] #["Events", "Phases", "Ranges", "Limits"]
+  shading_choices_status: ["info", "danger", "success", "danger"] #["info", "danger", "success", "danger"]
+  default_shading: {events: TRUE, limits: TRUE, ranges: TRUE, phases: FALSE}
+
+  show_menu_meta: [] #
+
+  # Menu in Settings Pane
+  show_events_set: FALSE
+  own_events: FALSE
+  event_max_reps: 3
+  event_max_extent: 10000
+
+  show_agrodata_set: FALSE # unneeded
+  edit_agrodata: FALSE # unneeded
+
+  show_elements_set: FALSE # unneeded
+  edit_elements: TRUE # unneeded
+  delete_elements: TRUE # unneeded
+
+  show_maps_set: TRUE # unneeded
+  upload_maps: FALSE # unneeded
+  delete_maps: FALSE # unneeded
+  download_maps: TRUE 
+  download_formats: {GeoTiff: ".tif", Shape: ".shp", Excel: ".xls"}
+
+
+###------- USER PROFILES ---------
+# This defines the Menu showing by each user Type
+nestle:
+  # RIGHTS / ACCESS
+  admin: FALSE
+  superadmin: FALSE
+  profile_name: "nestle"
+
+  # TAB NAMES
+  tabname_dash: Dashboard
+  tabname_map: Map
+  tabname_data: Data
+  tabname_setting: Settings
+  tabname_admin: Admin
+  tabname_table: Fields
+
+  # DASHBOARD TAB
+  edit_order: TRUE
+  riskbox1_menu: TRUE
+  riskbox2_menu: TRUE
+  weather_menu: TRUE
+  dris_menu: TRUE
+  agmet_menu: TRUE
+  gdd_menu: TRUE
+  soilmenu: TRUE
+
+
+  # MAP TAB
+  # high level // what list type
+  mapmenu_available: TRUE  # is there a manu at all
+  map_structure: simple   # none, simple, fieldmanager
+  element_menu_type : complete   # none, simple, complete
+  reverse_order: F # first map or element tab (of flying menu)
+  start_mapmenu_open: T # map menu initially open
+
+  # details of Element Tab
+  elem_tab_name: "Clima"
+  show_menu_elements: ["btn_add_manual", "btn_edit_manual", "btn_add_api", "btn_upload_csv"]
+  show_element_timeselect: FALSE
+
+  # WHAT ELEMENTS TYPES ARE AVAILABLE WHERE
+  available_element_types:  ["AM", "WS"] #what the user can add (select when adding pin)
+  elem_render: ["AM", "WS"]  # what elem types are rendered at all
+  elem_types_menu:  ["AM", "WS"]  #what elem types are we displaying in the element list menu
+
+  elem_has_lbl: ["AM", "WS"] # what elem types do have labels
+  elem_lbl_preprint: ["AM"]  # what elem types have preprinted labels
+  elem_types_stshow:  ["AM"] #what elem types are we showing in startup // NOTE: SHOULD NOT BE THE SAME AS PRE-PRINT OW IT'S PRINTING THEM ANYWAY AT STARTUP
+  # details of map tab
+  layer_tab_name: "Mapas"
+  show_menu_layer: ["btn_upload_layer"]
+  
+  layer_types_menu:  ["POLYGON_SIMPLE"] #what is that for?????
+  layer_types_stshow: ["POLYGON_SIMPLE"] #what layer types are we showing in startup
+  exclude_from_render: ["Zero_Point", "Perp_Grid"]
+  polygon_popups: TRUE
+  point_popups: TRUE
+
+
+ #/ update_print_data / label_by_field / render_proxy_map
+
+  # DATA ANALYZER TAB
+  analyaermenu_available: TRUE
+  start_analyaermenu_open: FALSE
+
+  show_analyzer_elements: {element: TRUE, time_range: TRUE, ref_date: FALSE, graphs: FALSE, cum_func: FALSE, func_timing: FALSE, shading: FALSE}
+  graph_choices: []
+  default_time_range: "168"
+  default_graphs: "graphclimate"
+  default_cum_func: "value"
+  default_func_timing: "24"
+  default_cache_func: "ods_aggregate"
+
+  shading_choices: ["Events", "Phases", "Ranges", "Limits"] #["Events", "Phases", "Ranges", "Limits"]
+  shading_choices_status: ["info", "danger", "success", "danger"] #["info", "danger", "success", "danger"]
+  default_shading: {events: TRUE, limits: TRUE, ranges: TRUE, phases: FALSE}
+
+  show_menu_meta: [] #
+
+  # Menu in Settings Pane
+  show_events_set: FALSE
+  own_events: FALSE
+  event_max_reps: 3
+  event_max_extent: 10000
+
+  show_agrodata_set: FALSE
+  edit_agrodata: FALSE
+
+  show_elements_set: FALSE
+  edit_elements: TRUE
+  delete_elements: TRUE
+
+  show_maps_set: TRUE
+  upload_maps: FALSE
+  delete_maps: FALSE
+  download_maps: TRUE 
+  download_formats: {GeoTiff: ".tif", Shape: ".shp", Excel: ".xls"}
+
+
+
+
+
+

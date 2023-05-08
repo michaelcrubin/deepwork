@@ -1,0 +1,10 @@
+menu_id,menu_line,design,ttl,icn,id,toggle,ui_type,value,choices,min,max,step,plh,multi
+NEW_TASK,1,inline,Category,,txt_category,,picker,,ui_data.category_style.Category,,,,,FALSE
+NEW_TASK,2,inline,,,divider,,divider,,,,,,,
+NEW_TASK,3,inline,Name of Goal,,txt_activity,,text,,,,,,Name of Activity,
+NEW_TASK,3,inline,Project,,txt_project,,text,,,,,,Name of Project,
+NEW_TASK,4,inline,Hours to Complete,,num_workh,,number,,,0,,1,,
+NEW_TASK,5,inline,Due date,,date_plan,,date,,,,,,,
+NEW_TASK,6,inline,Describe,,txt_desc,,text,,,,,,Description of Activity,
+NEW_TASK,7,inline,SMART Criteria,,txt_criteria,,text,,,,,,S.M.A.R.T. Criteria,
+NEW_TASK,8,inline,Work in Progress h,,num_wip,,number,,,0,8,0.25,,

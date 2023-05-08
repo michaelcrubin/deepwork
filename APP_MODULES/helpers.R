@@ -88,7 +88,7 @@ mke_today_workh <- function(goal_id, wip_h = 1, ...){
   px <- wip_h %>% magrittr::subtract(1) %>% max(0) %>% min(8) %>% 
     magrittr::multiply_by(100) %>% magrittr::add(18)
   
-  fluidRow(
+  b<- fluidRow(
     #id = ns(paste0(goal_id, "_wiph_stripe")),
     class = "stripes", style = paste0("margin-bottom: 0px;  height: ",px,"px;"),
     tags$p(style = paste0("line-height: ",px,"px;"), 
@@ -293,76 +293,29 @@ mke_bucket_header <- function(ttl, suffix, ns, css_id){
 
 ## UI ------------ GOAL BOXES --------------------
 
-
-# # makes the progress strip for the working today part
-# today_workh_section <- function(ns, goal_id, css_id, wip_h = 1){
-#   px <- wip_h %>% magrittr::subtract(1) %>% max(0) %>% min(8) %>% 
-#     magrittr::multiply_by(100) %>% magrittr::add(18)
-#   if (css_id == "day_bucket_left") {
-#     fluidRow(
-#       id = ns(paste0(goal_id, "_wiph_stripe")),
-#       class = "stripes", style = paste0("margin-bottom: 0px;  height: ",px,"px;"),
-#       tags$p(style = paste0("line-height: ",px,"px;"), 
-#              paste("Working on it for", min(wip_h, 8), "h...")
-#       )
-#     )
-#   } else {
-#     shinyjs::hidden(
-#       fluidRow(
-#         id = ns(paste0(goal_id, "_wiph_stripe")),
-#         class = "stripes", style = paste0("margin-bottom: 0px;  height: ",px,"px;"),
-#         tags$p(style = paste0("line-height: ",px,"px;"), 
-#                paste("Working on it for", min(wip_h, 8), "h...")
-#         )
-#       )
-#     )
-#   }
-# }
-# 
-# # makes the subheader for projects and open hours
-# general_subheader <- function(ns, goal_id, Project, work_h, open_h, css_id, wip_h = 1){
-#   
-#   if (css_id == "day_bucket_left") {
-#     shinyjs::hidden(
-#       fluidRow(
-#         shiny::uiOutput(ns(paste0(goal_id, "_bar"))),
-#         shiny::uiOutput(ns(paste0(goal_id, "_bar"))), 
-#         id = ns(paste0(goal_id, "_sub_header")),
-#         style = "margin-bottom: 0px;",
-#         dashboardBadge(Project, color = "secondary", rounded = F),
-#         dashboardBadge(paste("Total", work_h, "h"), color = "info", rounded = F),
-#         dashboardBadge(paste(open_h, "h left"), color = "info", rounded = F),
-#         dashboardBadge(paste("Next slice", wip_h, "h"), color = "info", rounded = F)
-#       )
-#     )
-#   } else {
-#     fluidRow(
-#       id = ns(paste0(goal_id, "_sub_header")),
-#       style = "margin-bottom: 0px;",
-#       dashboardBadge(Project, color = "secondary", rounded = F),
-#       dashboardBadge(paste("Total", work_h, "h"), color = "info", rounded = F),
-#       dashboardBadge(paste(open_h, "h left"), color = "info", rounded = F),
-#       dashboardBadge(paste("Next slice", wip_h, "h"), color = "info", rounded = F)
-#     )
-#   }
-# }
-
 today_workh_section <- function(ns, goal_id, css_id, wip_h = 1){
   if (css_id == "day_bucket_left") {
-    shiny::uiOutput(ns(paste0(goal_id, "_wiph_render")))
+    tags$div(id = ns(paste0(goal_id, "_wiph_stripe")),
+             shiny::uiOutput(ns(paste0(goal_id, "_wiph_render")))
+             )
   } else {
-    shinyjs::hidden(shiny::uiOutput(ns(paste0(goal_id, "_wiph_render"))) )
+    tags$div(id = ns(paste0(goal_id, "_wiph_stripe")),
+             shiny::uiOutput(ns(paste0(goal_id, "_wiph_render")))
+             ) %>% shinyjs::hidden()
   }
 }
 
 # makes the subheader for projects and open hours
 general_subheader <- function(ns, goal_id, Project, work_h, open_h, css_id, wip_h = 1){
   if (css_id == "day_bucket_left") {
-    shiny::uiOutput(ns(paste0(goal_id, "_sbh_render")))
+    tags$div(id = ns(paste0(goal_id, "_sub_header")),
+             shiny::uiOutput(ns(paste0(goal_id, "_sbh_render")))
+             ) %>% shinyjs::hidden()
   } else {
-    shinyjs::hidden(shiny::uiOutput(ns(paste0(goal_id, "_sbh_render"))) )
+    tags$div(id = ns(paste0(goal_id, "_sub_header")),
+             shiny::uiOutput(ns(paste0(goal_id, "_sbh_render")))
+             )
   }
-
 }
 
 # makes the header title, subtitle + detail toggle for box
@@ -382,16 +335,15 @@ mke_header <- function(ns, goal_id, Activity, Project, work_h, open_h, wip_h, cs
              )
       )
     ),
-               
-    tags$div(id = ns(paste0(goal_id, "_wiph_stripe")),
-             today_workh_section(ns, goal_id, css_id, wip_h)
-             ),
-    tags$div(id = ns(paste0(goal_id, "_sub_header")),
-             general_subheader(ns, goal_id, Project, work_h, open_h, css_id, wip_h),
-    ),
+    today_workh_section(ns, goal_id, css_id, wip_h),
+    general_subheader(ns, goal_id, Project, work_h, open_h, css_id, wip_h),
     tags$hr(style = "margin-top: 7px;margin-bottom: 4px;")
   )
 }
+#daily_id-gl00080_wiph_stripe
+#daily_id-gl00080_wiph_render
+#daily_id-gl00081_wiph_render
+#daily_id-gl00081_wiph_stripe
 
 # makes the Body (details) for box
 mke_body <- function(ns, goal_id, Description, Criteria, wip_h){
@@ -705,7 +657,6 @@ render_progress_bar <- function(goal, output){
 # renders all goals progress bar functions
 render_wip_h <- function(goal, output){
   # updating the slider
-
   a<-goal %>% mutate(
     id = paste0(goal_id, "_wiph_render"),
     value = pmap(., .f = mke_today_workh)) %>% 
@@ -773,7 +724,6 @@ toggle_edit_mode <- function(id, flag, ...){
 
 toggle_wiph_sbh <- function(id, flag, ...){
   # is day
-  browser()
   if (isTRUE(flag)){
     shinyjs::show(paste0(id, "_wiph_stripe"))
     shinyjs::hide(paste0(id, "_sub_header"))
@@ -784,6 +734,166 @@ toggle_wiph_sbh <- function(id, flag, ...){
     shinyjs::hide(paste0(id, "_wiph_stripe"))
   }
 }
+
+
+## MODAL MENUS ---------------------------
+mke_ms_label <- function(ttl, icn = NULL, ...){
+  #css <- ui_defs$css
+  shiny::tagList(
+    tags$div(style = "padding-top: 10px"),
+    shiny::icon(OdsDataHelper::null_or_value(icn)), p(ttl))
+}
+
+# extract a pathed vector or list which is somewhere inside a nexted list.obtains nested list + path
+extract_nested_list <- function(data, path){
+  do.call(c, unlist(data, recursive=FALSE)) %>% magrittr::extract2(path)
+}
+
+
+
+make_ui_element <- function(ns, id, ui_type, value = NULL,  choices = NULL, min = NULL, max = NULL, step = NULL, plh = NULL, data = NULL, multi = FALSE, ...){
+  switch(ui_type,
+         
+         "picker" = {
+           shinyWidgets::pickerInput(
+             inputId = ns(id),
+             label = NULL, 
+             choices = extract_nested_list(data, choices),
+             multiple = multi,
+             selected = value, 
+             options = list(container = "body", dropupAuto = F)
+    
+           )
+           
+           },
+         
+         "number" = {
+           shiny::numericInput(
+             inputId = ns(id),
+             label = NULL,
+             value = value,
+             min = min,
+             max = max,
+             step = step,
+             width = '100px'
+           )
+         },
+         
+         "text" = {
+           shiny::textInput(inputId = ns(id),
+                     label = NULL,
+                     value = value,
+                     width = NULL,
+                     placeholder = plh 
+            )
+         },
+         
+         "switch" = {
+           shinyWidgets::switchInput(
+             inputId = ns(id),
+             label = NULL,
+             value = value,
+             onLabel = "ON",
+             offLabel = "OFF",
+             size = "default",
+             disabled = FALSE,
+             inline = FALSE,
+             width = NULL
+           )
+         },
+         
+         "date" = {
+           shinyWidgets::airDatepickerInput(
+             inputId = ns(id),
+             label = NULL,
+             value = NULL,
+             multiple = FALSE,
+             range = FALSE,
+             timepicker = FALSE,
+             placeholder = Sys.time(),
+             dateFormat = "yyyy-MM-dd",
+             minDate = Sys.time(),
+             highlightedDates = NULL,
+             #view = c("days", "months", "years"),
+             #minView = c("days", "months", "years"),
+             #monthsField = c("monthsShort", "months"),
+             clearButton = TRUE,
+             todayButton = TRUE,
+             #autoClose = FALSE,
+             position = 'top right',
+             update_on = "close",
+             language = "en",
+             width = NULL,
+             toggleSelected = TRUE
+           )
+           },
+         
+         "divider" = {tags$hr()},
+         
+         "empty" = {tags$br(style = "line-height: 70%;")}
+         
+         #"datepicker" = {ods_datepicker(ui_data, id, params, ui_defs, ui_subtype, label)},
+         
+         #"checkbox" = {ods_checkbox(ui_data, id, params, ui_defs, ui_subtype, label)},
+
+         #"fileInput" = {ods_fileInput(ui_data, id, params, ui_defs, ui_subtype, label)},
+         
+         #"button" = {ods_msButton(ui_data, id, params, ui_defs, ui_subtype, label)},
+         
+         
+         #"sliderInput" = {ods_sliderInput(ui_data, id, params, ui_defs, ui_subtype, label)},
+         
+         #"static" = {ods_staticUI(id, ui_subtype, ui_data, ui_defs, params)},
+         
+         #"render" = {ods_renderUI(id, ui_subtype)}
+  )
+}
+
+
+mke_menu_line <- function(ns, data, ui_type, ...){
+
+  if (ui_type %in% "divider"){
+    ret <- shiny::fluidRow(shiny::column(12, tags$hr()))
+  } else if (ui_type %in% "empty"){
+    ret <- shiny::fluidRow(shiny::column(12,tags$br(style = "line-height: 70%;")))
+  } else {
+    ret<-shiny::fluidRow(
+      shiny::column(3,mke_ms_label(...)),
+      shiny::column(6, make_ui_element(ui_type = ui_type, ns = ns, data = data, ...))
+    )
+    
+  }
+
+  return(ret)
+}
+
+
+new_goal_modal <- function(ms_menu, ns, data) {
+  shiny::showModal(
+    tags$div(class = "prim_mod",# defines the class
+             modalDialog(
+               style="width: 68vw;",
+               # header
+               title = "Add new Task",
+               # body
+               tagList(
+                 "You can add a new temporary task or a permanent goal.",
+                 tags$hr(),
+                 # creating all ui element on the fly
+                 ms_menu %>% pmap(.f = mke_menu_line, ns = ns, data = data),
+                 tags$br()
+               ),
+               # footer
+               footer = tagList(
+                 actionButton(ns("ok_add_task"),label = "Save", icon = icon("save"))
+               ),
+               easyClose = TRUE, fade = TRUE
+             )
+    )
+  )
+
+}
+
 ## ------------ DATA TABLE MODULE --------------------
 
 # makes a nice empty DT in case of no data

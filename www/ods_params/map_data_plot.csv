@@ -1,0 +1,7 @@
+popup_type,popup_body_type,popup_body_f
+border,DT,PKEP_popup_tbl
+numeric,UI,popup_var_graph
+AM,DT,popup_weather_data
+FE,DT,
+WS,DT,popup_weather_data
+PL,DT,

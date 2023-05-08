@@ -1,0 +1,10 @@
+format,lead_format,mandatory,geo_main_type,save_format
+.tif,.tif,TRUE,RASTER,TRUE
+.kml,.kml,TRUE,VECTOR,FALSE
+.kmz,.kmz,TRUE,VECTOR,FALSE
+.shp,.shp,TRUE,VECTOR,TRUE
+.shx,.shp,TRUE,VECTOR,FALSE
+.dbf,.shp,TRUE,VECTOR,FALSE
+.prj,.shp,TRUE,VECTOR,FALSE
+.tiff,.tiff,TRUE,RASTER,FALSE
+.image/tif,.image/tif,TRUE,RASTER,FALSE

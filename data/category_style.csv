@@ -1,6 +1,7 @@
-﻿Category,bs_color,icon
-Job & Purpose,maroon,briefcase
-Family & Relationships,pink,heart
-Health & Lifestyle,purple,briefcase-medical
-Housing Structure Routines,lime,house
-General,lightblue,globe
+﻿Category,bs_color,icon,category_id
+Job & Purpose,maroon,briefcase,job
+Family & Relationships,pink,heart,family
+Health & Lifestyle,purple,briefcase-medical,health
+Housing Structure Routines,lime,house,housing
+General,lightblue,globe,general
+Temporary,grey,,temporary

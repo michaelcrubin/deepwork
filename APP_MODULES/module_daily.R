@@ -1,6 +1,10 @@
 ## Module Create New Platform user
 
 
+
+
+
+
 ### UI MODULE -----------------
 Daily_UI <- function(id, params) {
   ns <- NS(id)
@@ -16,7 +20,7 @@ Daily_UI <- function(id, params) {
              shiny::fluidRow(shiny::h2("Day Focus")),
              shiny::fluidRow(shiny::h5("Plan Deep Work Periods"))
       ),
-      column(2, actionButton(ns("update"), "Update"))
+      column(2, actionButton(ns("add_task"), "New Task"))
     ),
     fluidRow(
       column(width = 12,
@@ -36,9 +40,9 @@ Daily_SERVER <- function(id, r_data, r_control, params) {
     ns <- session$ns
 
     # currently not used
-    observeEvent(input$update, {
-      req(F)
-      r_control$rerender_daily <- OdsUIHelper::reactive_trigger()
+    observeEvent(input$add_task, {
+     # r_control$rerender_daily <- OdsUIHelper::reactive_trigger()
+      r_control$add_task <- OdsUIHelper::reactive_trigger()
     })
     
     ## -----BUCKET RENDERER ----------
@@ -46,6 +50,7 @@ Daily_SERVER <- function(id, r_data, r_control, params) {
     observe({
       print("rendering daily")
       r_control$rerender_daily
+      a<- isolate(r_data$goal)
       render_bucket_list(goal = isolate(r_data$goal),
                          id = "day_bucket",
                          ttl_left = "Focus of Day",
@@ -62,6 +67,13 @@ Daily_SERVER <- function(id, r_data, r_control, params) {
       render_progress_bar(isolate(r_data$goal), output)
     })
     
+    # initial statusbadge rendering
+    observe({
+      print("renders all badges daily")
+      r_control$rerender_daily
+      render_status_badge(isolate(r_data$goal), output)
+    })
+    
     # initial wiph rendering
     observe({
       print("renders all wiph initially")
@@ -75,15 +87,7 @@ Daily_SERVER <- function(id, r_data, r_control, params) {
       r_control$rerender_daily
       render_subheader(isolate(r_data$goal), output)
     })
-    
-    # initial statusbadge rendering
-    observe({
-      print("renders all badges daily")
-      r_control$rerender_daily
-      render_status_badge(isolate(r_data$goal), output)
-    })
 
-    
     ## -----PROGRESS UPDATE ----------
     # listen to update inputs (slider)
     progress_listener_d <- reactive({
@@ -92,7 +96,7 @@ Daily_SERVER <- function(id, r_data, r_control, params) {
         mutate(old_Progress = Progress) %>%
         mutate(Progress = as.numeric(value) / 100) %>% 
         mutate(change = Progress != old_Progress) %>% dplyr::filter(change)
-      })
+      }) %>% debounce(500)
   
     # observe progress slider and update + save Dataset + update bar
     observe({
@@ -111,7 +115,9 @@ Daily_SERVER <- function(id, r_data, r_control, params) {
     observeEvent(r_control$render_progress_bar, {
       req(r_control$render_progress_bar)
       render_progress_bar(r_control$render_progress_bar, output)
-      update_slider_progress(r_control$render_progress_bar, session)
+      if (r_control$actual_tab %in% c("weekly_id", "quarterly_id")) {
+        update_slider_progress(r_control$render_progress_bar, session)
+      }
     })
     
     ## -----WIP HOURS UPDATE ----------
@@ -122,10 +128,11 @@ Daily_SERVER <- function(id, r_data, r_control, params) {
         mutate(old_wip_h = wip_h) %>%
         mutate(wip_h = as.numeric(value)) %>% 
         mutate(change = wip_h != old_wip_h) %>% dplyr::filter(change)
-    })
+    }) %>% debounce(500)
     
     # observe progress slider and update + save Dataset + update bar
     observe({
+     # req(F)
       input_df <- wip_h_listener_d()
       req(nrow(input_df) > 0)
       # storing the data
@@ -138,13 +145,12 @@ Daily_SERVER <- function(id, r_data, r_control, params) {
     
     # rerendering the progress bar in this namespace
     observeEvent(r_control$render_wip_h, {
-      
       req(r_control$render_wip_h)
       render_wip_h(r_control$render_wip_h, output)
       render_subheader(r_control$render_wip_h, output)
-      update_number_wiph(r_control$render_wip_h, session)
-      
-      #update_slider_progress(r_control$render_progress_bar, session)
+      if (r_control$actual_tab %in% c("weekly_id", "quarterly_id")) {
+        update_number_wiph(r_control$render_wip_h, session)
+      }
     })
     
     
@@ -172,7 +178,9 @@ Daily_SERVER <- function(id, r_data, r_control, params) {
     observeEvent(r_control$render_status_badge, {
       req(r_control$render_status_badge)
       render_status_badge(r_control$render_status_badge, output)
-      update_picker_badge(r_control$render_status_badge, session)
+      if (r_control$actual_tab %in% c("weekly_id", "quarterly_id")) {
+        update_picker_badge(r_control$render_status_badge, session)
+      }
     })
     
     
@@ -197,6 +205,7 @@ Daily_SERVER <- function(id, r_data, r_control, params) {
       isolate(r_data$goal) %>% listen_to(input, "week", "_toggle") %>% purrr::modify(as.logical)
       })
 
+    
     
     # observe to toggle the Detail section
     observe({
